@@ -1,68 +1,78 @@
-# Deploying the Astro (dynamic) site
+# Deploying to Cloudflare Pages
 
-This project renders on the server (`output: 'server'` + `@astrojs/node`), so
-it needs a host that runs Node — **not** GitHub Pages, which only serves
-static files and can't run the `/api/contact` endpoint or per-request
-rendering.
+This project renders on the server (`output: 'server'` + `@astrojs/cloudflare`),
+running as Cloudflare Pages Functions on the Workers runtime.
 
-Pick one of these:
+## Cloudflare Pages dashboard settings
+When connecting the repo (Workers & Pages → Create → Pages → Connect to Git):
+- **Production branch**: whichever branch you actually push to (commonly `main`)
+- **Build command**: `npm run build`
+- **Build output directory**: `dist`
+- **Root directory**: leave blank unless this project lives in a subfolder of the repo
 
-## Option A — Render.com (simple, free tier available)
-1. Push this project to a GitHub repo.
-2. On Render: **New → Web Service**, connect the repo.
-3. Build command: `npm install && npm run build`
-4. Start command: `npm run start`
-5. Add environment variables (Render dashboard → Environment):
-   `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`
-6. Once deployed, add `saanvi.n4ir.com` as a custom domain in Render's
-   settings, then add the CNAME record it gives you to your DNS provider for
-   `n4ir.com`.
-
-## Option B — Railway.app
-Same idea as Render: connect the repo, it detects Node automatically,
-set the same environment variables, then attach the custom domain via
-Railway's settings + a CNAME record at your DNS provider.
-
-## Option C — A VPS you manage yourself
-```bash
-git clone <your-repo>
-cd saanvi-astro
-npm install
-npm run build
-# create a .env file with SMTP_HOST / SMTP_PORT / SMTP_USER / SMTP_PASS
-npm run start   # runs node ./dist/server/entry.mjs, serves on port 4321 by default
-```
-Put this behind a reverse proxy (nginx/Caddy) for HTTPS + the custom domain,
-and use a process manager (pm2, systemd) to keep it running.
-
-## Option D — Vercel / Netlify / Cloudflare Pages
-These platforms also support Astro SSR, but each needs a *different* adapter
-package instead of `@astrojs/node`:
-- Vercel → `@astrojs/vercel`
-- Netlify → `@astrojs/netlify`
-- Cloudflare → `@astrojs/cloudflare`
-
-Swap the adapter in `astro.config.mjs` (`npx astro add vercel`, for example,
-does this automatically), then follow that platform's own "connect a Git
-repo" flow. Environment variables are set in that platform's dashboard,
-same idea as Option A.
+No environment variables are needed — the contact form posts straight to
+Formspree from the browser, so there's no server secret to configure here.
 
 ## Custom domain (saanvi.n4ir.com)
-Whichever host you pick, the pattern is the same:
-1. Deploy first, confirm the auto-generated URL (e.g. `*.onrender.com`) works.
-2. In the host's dashboard, add `saanvi.n4ir.com` as a custom domain — it'll
-   give you a CNAME target.
-3. In your DNS provider for `n4ir.com`, add a CNAME record: host `saanvi`,
-   value = whatever the host gave you.
-4. Wait for DNS to propagate (minutes to a few hours), then enable HTTPS if
-   it isn't automatic.
+1. Deploy once first and confirm the auto-generated `*.pages.dev` URL works.
+2. In the Pages project → **Custom domains**, add `saanvi.n4ir.com`.
+3. Since `n4ir.com` is already on Cloudflare, this is usually a one-click
+   "Activate domain" rather than a manual DNS record — Cloudflare adds the
+   CNAME for you automatically when the domain's on the same account.
 
-## Updating the site later
+## Updating the site
 ```bash
 git add .
 git commit -m "describe what changed"
 git push
 ```
-Most Node hosts (Render, Railway, Vercel, Netlify, Cloudflare) auto-redeploy
-on every push once connected. A self-managed VPS needs a manual
-`git pull && npm install && npm run build` + restart.
+This should trigger an automatic build in Cloudflare Pages. If it doesn't,
+see the checklist below.
+
+## Git push not triggering a build — checklist
+Work through these in order; one of the first few almost always explains it:
+
+1. **Direct Upload vs Git integration.** If this Pages project was originally
+   created via "Upload assets" instead of "Connect to Git," it will *never*
+   auto-build on push — that's a different deployment mode entirely, and you
+   can't switch a Direct Upload project to Git integration after the fact.
+   Check **Settings → Builds & deployments** for which mode it's in; if it's
+   Direct Upload, you'd need to create a new Pages project connected via Git.
+2. **Branch control.** Project → **Settings → Builds → Branch control** —
+   confirm "Enable automatic production branch deployments" is **on**, and
+   that you're pushing to the exact branch set as the Production branch.
+3. **Repo permissions.** The Cloudflare GitHub App needs at least *Maintainer*
+   access on the repo to receive webhook events — Contributor-level access
+   silently won't trigger anything.
+4. **Suspended installation.** Check `github.com/settings/installations` (or
+   your org's equivalent) for the "Cloudflare Workers & Pages" app. If it
+   shows suspended, there's an "Unsuspend" button at the bottom of its
+   settings page.
+5. **Reinstall the Git integration.** Settings → Builds & deployments → Git
+   integration → disconnect, then reconnect the repo. This resolves most
+   silent webhook failures that aren't explained by 1–4.
+6. **Check Cloudflare's status page** (cloudflarestatus.com) for ongoing
+   incidents affecting Pages builds/webhook delivery — these happen
+   occasionally platform-wide and aren't a config problem on your end.
+
+## Local preview with Wrangler
+`npm run dev` (the Astro dev server) is fine for everyday editing. To test
+against the actual Workers runtime before pushing:
+```bash
+npm run build
+npm run preview   # runs: wrangler pages dev ./dist
+```
+
+## Alternative hosts
+If you ever move off Cloudflare, this project needs *a* server-capable host
+either way — the adapter would need to change again:
+- **Render / Railway**: swap back to `@astrojs/node` (`npm install @astrojs/node`,
+  update `astro.config.mjs`), build command `npm install && npm run build`,
+  start command `node ./dist/server/entry.mjs`.
+- **Vercel**: `@astrojs/vercel` (`npx astro add vercel` does this automatically).
+- **Netlify**: `@astrojs/netlify` (`npx astro add netlify`).
+- **A VPS**: same as Render's Node setup, behind nginx/Caddy for HTTPS, kept
+  alive with pm2 or systemd.
+
+GitHub Pages still won't work for any SSR variant of this project — it only
+serves static files.

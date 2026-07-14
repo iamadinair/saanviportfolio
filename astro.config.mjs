@@ -1,12 +1,10 @@
 import { defineConfig } from 'astro/config';
-import node from '@astrojs/node';
+import cloudflare from '@astrojs/cloudflare';
 
-// Server output = pages (and the /api/contact route) render on request,
-// not just once at build time. That's what makes `npm run dev` and the
-// deployed site genuinely dynamic rather than a pre-built static export.
+// Server output = pages render on request, not just once at build time —
+// that's what makes the site genuinely dynamic. The Cloudflare adapter runs
+// this as Pages Functions (Workers runtime), not a persistent Node process.
 export default defineConfig({
   output: 'server',
-  adapter: node({
-    mode: 'standalone',
-  }),
+  adapter: cloudflare(),
 });
