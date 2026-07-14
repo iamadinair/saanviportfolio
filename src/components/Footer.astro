@@ -1,0 +1,11 @@
+---
+import { siteConfig } from '../data/site.config.js';
+---
+<footer>
+  <div class="container footer-inner">
+    <span>&copy; {new Date().getFullYear()} {siteConfig.profile.name}'s portfolio.</span>
+    {siteConfig.instagram && (
+      <a href={siteConfig.instagram} target="_blank" rel="noopener">Instagram ↗</a>
+    )}
+  </div>
+</footer>

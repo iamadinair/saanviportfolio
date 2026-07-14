@@ -1,0 +1,17 @@
+{
+  "name": "saanvi-portfolio",
+  "type": "module",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "start": "node ./dist/server/entry.mjs"
+  },
+  "dependencies": {
+    "astro": ">=6.0.0",
+    "@astrojs/node": ">=9.0.0",
+    "nodemailer": "^6.9.0"
+  }
+}

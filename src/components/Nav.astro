@@ -1,0 +1,17 @@
+---
+import { siteConfig } from '../data/site.config.js';
+---
+<header class="nav">
+  <div class="container nav-inner">
+    <div class="nav-mark">{siteConfig.profile.name}</div>
+    <ul class="nav-links">
+      <li><a href="#gallery">Gallery</a></li>
+      <li><a href="#about">About</a></li>
+      {siteConfig.showCompCard && <li><a href="#compcard">Comp card</a></li>}
+      <li><a href="#contact">Contact</a></li>
+      {siteConfig.instagram && (
+        <li><a href={siteConfig.instagram} target="_blank" rel="noopener">Instagram</a></li>
+      )}
+    </ul>
+  </div>
+</header>

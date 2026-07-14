@@ -1,0 +1,77 @@
+<section id="contact">
+  <div class="container">
+    <div class="section-head reveal">
+      <p class="eyebrow">Booking inquiries</p>
+      <h2>Get in touch</h2>
+      <p>Managed by parent/guardian.</p>
+    </div>
+    <div class="contact-wrap reveal">
+      <form id="contact-form">
+        <div class="field">
+          <label for="cf-name">Your name</label>
+          <input type="text" id="cf-name" name="name" placeholder="Agency or casting director name" required>
+        </div>
+        <div class="field">
+          <label for="cf-email">Email</label>
+          <input type="email" id="cf-email" name="email" placeholder="name@agency.com" required>
+        </div>
+        <div class="field">
+          <label for="cf-type">Inquiry type</label>
+          <select id="cf-type" name="type">
+            <option>Casting opportunity</option>
+            <option>Photoshoot request</option>
+            <option>General inquiry</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="cf-message">Message</label>
+          <textarea id="cf-message" name="message" rows="4" placeholder="Tell us about the opportunity" required></textarea>
+        </div>
+        <button type="submit" class="btn" id="cf-submit">Send inquiry</button>
+      </form>
+      <p class="form-note" id="cf-status">Sent directly from this page — nothing opens in a separate app.</p>
+    </div>
+  </div>
+</section>
+
+<script>
+  const form = document.getElementById('contact-form');
+  const statusEl = document.getElementById('cf-status');
+  const submitBtn = document.getElementById('cf-submit');
+  const defaultStatus = statusEl.textContent;
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Sending…';
+    statusEl.textContent = defaultStatus;
+
+    const payload = {
+      name: document.getElementById('cf-name').value.trim(),
+      email: document.getElementById('cf-email').value.trim(),
+      type: document.getElementById('cf-type').value,
+      message: document.getElementById('cf-message').value.trim(),
+    };
+
+    try {
+      const res = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json();
+
+      if (res.ok) {
+        statusEl.textContent = "Thanks — that's been sent. We'll be in touch soon.";
+        form.reset();
+      } else {
+        statusEl.textContent = data.error || 'Something went wrong sending that — please try again.';
+      }
+    } catch (err) {
+      statusEl.textContent = 'Network error — please try again in a moment.';
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Send inquiry';
+    }
+  });
+</script>
