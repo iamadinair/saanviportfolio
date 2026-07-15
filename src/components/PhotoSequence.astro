@@ -4,7 +4,12 @@ const { gallery } = siteConfig;
 ---
 <section id="gallery" class="photo-sequence">
   {gallery.map((item) => (
-    <figure class:list={['photo-block', 'reveal', { 'photo-block-placeholder': item.placeholder }]}>
+    <figure class:list={[
+      'photo-block',
+      'reveal',
+      item.orientation === 'landscape' ? 'photo-block--landscape' : 'photo-block--portrait',
+      { 'photo-block-placeholder': item.placeholder },
+    ]}>
       {item.placeholder ? (
         <div class="photo-block-frame placeholder">
           <span>More photos<br />coming soon</span>

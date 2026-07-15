@@ -52,18 +52,20 @@ export const siteConfig = {
   // Rendered top to bottom as full-bleed photo blocks. Add/remove/reorder
   // freely; `placeholder: true` renders the "coming soon" tile instead of
   // an image.
+  // Each item renders as a framed portrait card unless orientation: 'landscape'.
   gallery: [
+    {
+      src: '/images/gallery-saanvi-02.png',
+      alt: 'Saanvi wearing a red pom-pom hat',
+      index: '01',
+      caption: 'Red beanie days',
+      orientation: 'landscape',
+    },
     {
       src: '/images/hero-saanvi.png',
       alt: 'Saanvi in a brown knit sweater, smiling at the camera',
-      index: '01',
-      caption: 'Cosy knit',
-    },
-    {
-      src: '/images/gallery-saanvi-01.png',
-      alt: 'Saanvi wearing a red pom-pom hat',
       index: '02',
-      caption: 'Red beanie days',
+      caption: 'Cosy knit',
     },
     {
       src: '/images/gallery-saanvi-03-puffer.png',

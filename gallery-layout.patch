@@ -1,0 +1,181 @@
+diff --git a/src/components/PhotoSequence.astro b/src/components/PhotoSequence.astro
+index 879b3fa..e49fe0c 100644
+--- a/src/components/PhotoSequence.astro
++++ b/src/components/PhotoSequence.astro
+@@ -4,7 +4,12 @@ const { gallery } = siteConfig;
+ ---
+ <section id="gallery" class="photo-sequence">
+   {gallery.map((item) => (
+-    <figure class:list={['photo-block', 'reveal', { 'photo-block-placeholder': item.placeholder }]}>
++    <figure class:list={[
++      'photo-block',
++      'reveal',
++      item.orientation === 'landscape' ? 'photo-block--landscape' : 'photo-block--portrait',
++      { 'photo-block-placeholder': item.placeholder },
++    ]}>
+       {item.placeholder ? (
+         <div class="photo-block-frame placeholder">
+           <span>More photos<br />coming soon</span>
+diff --git a/src/data/site.config.js b/src/data/site.config.js
+index e271967..ca11fde 100644
+--- a/src/data/site.config.js
++++ b/src/data/site.config.js
+@@ -56,18 +56,20 @@ export const siteConfig = {
+   // Rendered top to bottom as full-bleed photo blocks. Add/remove/reorder
+   // freely; `placeholder: true` renders the "coming soon" tile instead of
+   // an image.
++  // Each item renders as a framed portrait card unless orientation: 'landscape'.
+   gallery: [
+     {
+-      src: '/images/hero-saanvi.png',
+-      alt: 'Saanvi in a brown knit sweater, smiling at the camera',
++      src: '/images/gallery-saanvi-02.png',
++      alt: 'Saanvi wearing a red pom-pom hat',
+       index: '01',
+-      caption: 'Cosy knit',
++      caption: 'Red beanie days',
++      orientation: 'landscape',
+     },
+     {
+-      src: '/images/gallery-saanvi-01.png',
+-      alt: 'Saanvi wearing a red pom-pom hat',
++      src: '/images/hero-saanvi.png',
++      alt: 'Saanvi in a brown knit sweater, smiling at the camera',
+       index: '02',
+-      caption: 'Red beanie days',
++      caption: 'Cosy knit',
+     },
+     {
+       src: '/images/gallery-saanvi-03-puffer.png',
+diff --git a/src/styles/global.css b/src/styles/global.css
+index 1874e16..72f5c93 100644
+--- a/src/styles/global.css
++++ b/src/styles/global.css
+@@ -169,59 +169,107 @@ header.nav {
+   position: relative;
+ }
+ 
+-.photo-block-frame {
++/* ---- Landscape: full-bleed hero treatment ---- */
++.photo-block--landscape .photo-block-frame {
+   width: 100%;
++  height: 85vh;
++  min-height: 480px;
+   background: var(--surface);
+   overflow: hidden;
++}
++
++.photo-block--landscape .photo-block-frame img {
++  width: 100%;
++  height: 100%;
++  object-fit: cover;
++  object-position: center top;
++  transition: transform 1.2s cubic-bezier(.2,.8,.2,1);
++}
++
++.photo-block--landscape:hover .photo-block-frame img { transform: scale(1.03); }
++
++.photo-block--landscape figcaption {
++  position: absolute;
++  left: 6vw;
++  bottom: 28px;
+   display: flex;
+-  align-items: center;
+-  justify-content: center;
++  align-items: baseline;
++  gap: 12px;
++  color: #fff;
++  text-shadow: 0 2px 16px rgba(0,0,0,0.35);
+ }
+ 
+-.photo-block-frame img {
+-  display: block;
+-  max-width: 100%;
+-  max-height: 92vh;
+-  width: auto;
+-  height: auto;
++@media (min-width: 900px) {
++  .photo-block--landscape figcaption { left: 4rem; }
++}
++
++.photo-block--landscape .cap-index,
++.photo-block--landscape .cap-title { color: #fff; }
++
++/* ---- Portrait: framed card treatment ---- */
++.photo-block--portrait {
++  padding: 56px 6vw 8px;
++}
++
++.photo-block--portrait .photo-block-frame {
++  max-width: 460px;
++  aspect-ratio: 4 / 5;
++  margin: 0 auto;
++  border-radius: 20px;
++  background: var(--surface);
++  overflow: hidden;
++  box-shadow: var(--shadow);
++}
++
++.photo-block--portrait .photo-block-frame img {
++  width: 100%;
++  height: 100%;
++  object-fit: cover;
++  object-position: center top;
+   transition: transform 1.2s cubic-bezier(.2,.8,.2,1);
+ }
+ 
+-.photo-block:hover .photo-block-frame img { transform: scale(1.03); }
++.photo-block--portrait:hover .photo-block-frame img { transform: scale(1.03); }
+ 
+-.photo-block-frame.placeholder {
+-  min-height: 320px;
++.photo-block--portrait.photo-block-placeholder .photo-block-frame {
+   display: flex;
+   align-items: center;
+   justify-content: center;
+   color: var(--ink-soft);
+   font-size: 15px;
+   text-align: center;
++  box-shadow: none;
++  border: 1.5px dashed var(--line);
+ }
+ 
+-.photo-block figcaption {
++.photo-block--portrait figcaption {
++  max-width: 460px;
++  margin: 16px auto 0;
+   display: flex;
+   align-items: baseline;
+-  gap: 12px;
+-  padding: 18px 6vw 36px;
++  justify-content: center;
++  gap: 10px;
+   color: var(--ink-soft);
+ }
+ 
+-@media (min-width: 900px) {
+-  .photo-block figcaption { padding-left: 4rem; padding-right: 4rem; }
++.photo-block--portrait .cap-index {
++  color: var(--accent-deep);
++}
++
++.photo-block--portrait .cap-title {
++  color: var(--ink);
+ }
+ 
+ .cap-index {
+   font-family: var(--font-display);
+   font-size: 14px;
+-  color: var(--accent-deep);
++  opacity: 0.8;
+ }
+ 
+ .cap-title {
+   font-family: var(--font-display);
+-  font-size: 20px;
++  font-size: 22px;
+   font-weight: 500;
+-  color: var(--ink);
+ }
+ 
+ /* ===================================================================
