@@ -1,24 +1,13 @@
 ---
 import { siteConfig } from '../data/site.config.js';
-const { gallery } = siteConfig;
+const landscapeItems = siteConfig.gallery.filter((item) => item.orientation === 'landscape');
 ---
 <section id="gallery" class="photo-sequence">
-  {gallery.map((item) => (
-    <figure class:list={[
-      'photo-block',
-      'reveal',
-      item.orientation === 'landscape' ? 'photo-block--landscape' : 'photo-block--portrait',
-      { 'photo-block-placeholder': item.placeholder },
-    ]}>
-      {item.placeholder ? (
-        <div class="photo-block-frame placeholder">
-          <span>More photos<br />coming soon</span>
-        </div>
-      ) : (
-        <div class="photo-block-frame">
-          <img src={item.src} alt={item.alt} />
-        </div>
-      )}
+  {landscapeItems.map((item) => (
+    <figure class="photo-block reveal photo-block--landscape">
+      <div class="photo-block-frame">
+        <img src={item.src} alt={item.alt} />
+      </div>
       <figcaption>
         <span class="cap-index">{item.index}</span>
         <span class="cap-title">{item.caption}</span>

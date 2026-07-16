@@ -1,0 +1,74 @@
+---
+import { siteConfig } from '../data/site.config.js';
+const carouselItems = siteConfig.gallery.filter((item) => item.orientation !== 'landscape');
+---
+<section id="carousel" class="carousel-section reveal">
+  <div class="carousel-wrap">
+    <button class="carousel-arrow carousel-arrow--prev" type="button" aria-label="Scroll to previous photo">
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+    </button>
+
+    <div class="carousel-track" id="carousel-track">
+      {carouselItems.map((item) => (
+        <figure class:list={['carousel-card', 'reveal', { 'carousel-card--placeholder': item.placeholder }]}>
+          {item.placeholder ? (
+            <div class="carousel-frame placeholder">
+              <span>More photos<br />coming soon</span>
+            </div>
+          ) : (
+            <div class="carousel-frame">
+              <img src={item.src} alt={item.alt} loading="lazy" />
+            </div>
+          )}
+          <figcaption>
+            <span class="cap-index">{item.index}</span>
+            <span class="cap-title">{item.caption}</span>
+          </figcaption>
+        </figure>
+      ))}
+    </div>
+
+    <button class="carousel-arrow carousel-arrow--next" type="button" aria-label="Scroll to next photo">
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+    </button>
+  </div>
+</section>
+
+<script>
+  const track = document.getElementById('carousel-track');
+  const prevBtn = document.querySelector('.carousel-arrow--prev');
+  const nextBtn = document.querySelector('.carousel-arrow--next');
+
+  if (track) {
+    // Turn vertical mouse-wheel motion into horizontal carousel scrolling
+    // while the carousel still has room to move; once it's fully scrolled
+    // in that direction, let the wheel resume scrolling the page normally.
+    track.addEventListener(
+      'wheel',
+      (e) => {
+        const atStart = track.scrollLeft <= 0;
+        const atEnd = track.scrollLeft + track.clientWidth >= track.scrollWidth - 1;
+        const scrollingDown = e.deltaY > 0;
+        const scrollingUp = e.deltaY < 0;
+
+        if ((scrollingDown && !atEnd) || (scrollingUp && !atStart)) {
+          e.preventDefault();
+          track.scrollLeft += e.deltaY * 1.4;
+        }
+      },
+      { passive: false }
+    );
+
+    const cardWidth = () => {
+      const card = track.querySelector('.carousel-card');
+      return card ? card.getBoundingClientRect().width + 20 : 320;
+    };
+
+    prevBtn?.addEventListener('click', () => {
+      track.scrollBy({ left: -cardWidth(), behavior: 'smooth' });
+    });
+    nextBtn?.addEventListener('click', () => {
+      track.scrollBy({ left: cardWidth(), behavior: 'smooth' });
+    });
+  }
+</script>

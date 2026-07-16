@@ -3,6 +3,7 @@ import PortfolioLayout from '../layouts/PortfolioLayout.astro';
 import Nav from '../components/Nav.astro';
 import Hero from '../components/Hero.astro';
 import PhotoSequence from '../components/PhotoSequence.astro';
+import PhotoCarousel from '../components/PhotoCarousel.astro';
 import Bio from '../components/Bio.astro';
 import CompCard from '../components/CompCard.astro';
 import ContactForm from '../components/ContactForm.astro';
@@ -13,6 +14,7 @@ import { siteConfig } from '../data/site.config.js';
   <Nav />
   <Hero />
   <PhotoSequence />
+  <PhotoCarousel />
   <Bio />
   {siteConfig.showCompCard && <CompCard />}
   <ContactForm />

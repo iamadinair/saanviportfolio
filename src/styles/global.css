@@ -206,60 +206,6 @@ header.nav {
 .photo-block--landscape .cap-index,
 .photo-block--landscape .cap-title { color: #fff; }
 
-/* ---- Portrait: framed card treatment ---- */
-.photo-block--portrait {
-  padding: 56px 6vw 8px;
-}
-
-.photo-block--portrait .photo-block-frame {
-  max-width: 460px;
-  aspect-ratio: 4 / 5;
-  margin: 0 auto;
-  border-radius: 20px;
-  background: var(--surface);
-  overflow: hidden;
-  box-shadow: var(--shadow);
-}
-
-.photo-block--portrait .photo-block-frame img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center top;
-  transition: transform 1.2s cubic-bezier(.2,.8,.2,1);
-}
-
-.photo-block--portrait:hover .photo-block-frame img { transform: scale(1.03); }
-
-.photo-block--portrait.photo-block-placeholder .photo-block-frame {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--ink-soft);
-  font-size: 15px;
-  text-align: center;
-  box-shadow: none;
-  border: 1.5px dashed var(--line);
-}
-
-.photo-block--portrait figcaption {
-  max-width: 460px;
-  margin: 16px auto 0;
-  display: flex;
-  align-items: baseline;
-  justify-content: center;
-  gap: 10px;
-  color: var(--ink-soft);
-}
-
-.photo-block--portrait .cap-index {
-  color: var(--accent-deep);
-}
-
-.photo-block--portrait .cap-title {
-  color: var(--ink);
-}
-
 .cap-index {
   font-family: var(--font-display);
   font-size: 14px;
@@ -270,6 +216,127 @@ header.nav {
   font-family: var(--font-display);
   font-size: 22px;
   font-weight: 500;
+}
+
+/* ===================================================================
+   CAROUSEL (images 2–5: horizontal, wheel-scrollable)
+=================================================================== */
+.carousel-section {
+  padding: 72px 0;
+}
+
+.carousel-wrap {
+  position: relative;
+}
+
+.carousel-wrap::before,
+.carousel-wrap::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 8vw;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.carousel-wrap::before {
+  left: 0;
+  background: linear-gradient(to right, var(--bg), transparent);
+}
+
+.carousel-wrap::after {
+  right: 0;
+  background: linear-gradient(to left, var(--bg), transparent);
+}
+
+.carousel-track {
+  display: flex;
+  gap: 24px;
+  overflow-x: auto;
+  scroll-snap-type: x proximity;
+  padding: 8px 8vw 28px;
+  scrollbar-width: thin;
+}
+
+@media (min-width: 900px) {
+  .carousel-track { padding-left: 4rem; padding-right: 4rem; }
+}
+
+.carousel-card {
+  flex: 0 0 auto;
+  width: min(72vw, 360px);
+  scroll-snap-align: center;
+  margin: 0;
+}
+
+.carousel-frame {
+  aspect-ratio: 4 / 5;
+  border-radius: 20px;
+  background: var(--surface);
+  overflow: hidden;
+  box-shadow: var(--shadow);
+}
+
+.carousel-frame img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+  transition: transform 0.6s cubic-bezier(.2,.8,.2,1);
+}
+
+.carousel-card:hover .carousel-frame img { transform: scale(1.05); }
+
+.carousel-card--placeholder .carousel-frame {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ink-soft);
+  font-size: 15px;
+  text-align: center;
+  box-shadow: none;
+  border: 1.5px dashed var(--line);
+}
+
+.carousel-card figcaption {
+  margin: 14px 4px 0;
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  color: var(--ink-soft);
+}
+
+.carousel-card .cap-index { color: var(--accent-deep); }
+.carousel-card .cap-title { color: var(--ink); font-size: 19px; }
+
+.carousel-arrow {
+  position: absolute;
+  top: 42%;
+  z-index: 3;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1.5px solid var(--line);
+  background: var(--bg);
+  color: var(--ink);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+.carousel-arrow:hover { background: var(--surface); transform: translateY(-50%) scale(1.06); }
+.carousel-arrow--prev { left: 1vw; transform: translateY(-50%); }
+.carousel-arrow--next { right: 1vw; transform: translateY(-50%); }
+
+@media (min-width: 900px) {
+  .carousel-arrow--prev { left: 1.25rem; }
+  .carousel-arrow--next { right: 1.25rem; }
+}
+
+@media (max-width: 700px) {
+  .carousel-arrow { display: none; }
 }
 
 /* ===================================================================
