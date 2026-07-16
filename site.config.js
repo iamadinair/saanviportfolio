@@ -33,7 +33,7 @@ export const siteConfig = {
   // ---- Profile ----
   profile: {
     name: 'Saanvi',
-    ageRange: '12–18 months',
+    age: '1 year',
     location: 'Melbourne, Australia',
     stats: {
       height: '73 cm',
