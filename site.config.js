@@ -24,7 +24,7 @@ export const siteConfig = {
     // NOTE: ccemail is a Web3Forms PRO feature — on the free plan this field
     // is very likely ignored. Verify in your Web3Forms dashboard; if
     // unsupported, forward manually from the primary inbox instead.
-    cc: 'adit_nair@hotmail.com',
+    //cc: 'adit_nair@hotmail.com',
   },
 
   // ---- Social ----
