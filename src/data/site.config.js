@@ -29,7 +29,7 @@ export const siteConfig = {
   // ---- Profile ----
   profile: {
     name: 'Saanvi',
-    ageRange: '12–18 months',
+    age: '1 year',
     location: 'Melbourne, Australia',
     stats: {
       height: '73 cm',
@@ -41,7 +41,7 @@ export const siteConfig = {
     // Pick 2–4 of these, or write your own — keep them specific and true.
     temperamentNotes: [
       'Comfortable with strangers',
-      'Adapts well to wardrobe changes',
+      'Adapt well to wardrobe changes',
       'Settles quickly after a short warm-up on set',
       'Happy under studio lighting',
       'Enjoys music playing during shoots',
