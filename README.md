@@ -27,10 +27,11 @@ saanvi-astro/
 │   ├── components/
 │   │   ├── Nav.astro
 │   │   ├── Hero.astro
-│   │   ├── PhotoSequence.astro     # loops over site.config.js's `gallery` array
+│   │   ├── PhotoSequence.astro     # full-bleed landscape photo(s) at the top
+│   │   ├── PhotoCarousel.astro     # horizontal wheel-scrollable portrait photos
 │   │   ├── Bio.astro               # stats/temperament woven into prose
 │   │   ├── CompCard.astro          # only rendered when showCompCard: true
-│   │   ├── ContactForm.astro       # posts to Formspree via fetch
+│   │   ├── ContactForm.astro       # posts to Web3Forms via fetch
 │   │   └── Footer.astro
 │   ├── pages/
 │   │   └── index.astro
@@ -46,27 +47,45 @@ saanvi-astro/
 ## Editing content
 Everything content-related lives in **`src/data/site.config.js`**:
 - `profile` — name, age range, location, stats, temperament notes
-- `gallery` — the array of photos rendered in the scroll sequence; add, remove,
+- `gallery` — the array of photos; each entry with `orientation: 'landscape'`
+  renders full-bleed at the top via `PhotoSequence.astro`, everything else
+  renders in the horizontal carousel via `PhotoCarousel.astro`. Add, remove,
   or reorder entries, or set `placeholder: true` for a "coming soon" tile
-- `contact` — Formspree endpoint + subject prefix (+ optional CC)
+- `contact` — Web3Forms access key + subject prefix (+ optional CC)
 - `instagram` — the linked Instagram URL
 - `showCompCard` / `compCardPdfPath` — comp card visibility + file location
 
-## Contact form (Formspree)
+## Contact form (Web3Forms)
 The form submits in the background via `fetch()` straight to
-[Formspree](https://formspree.io) — no `mailto:` popup, no visitor email
+[Web3Forms](https://web3forms.com) — no `mailto:` popup, no visitor email
 client involved, and no server code of our own to maintain.
 
-- The endpoint lives in `src/data/site.config.js` under `contact.formspreeEndpoint`.
-- Where the email actually lands is controlled in your **Formspree
-  dashboard** (whichever address the form was created under) — not in this
-  codebase.
-- CC: a `_cc` field is sent with each submission, but Formspree's free plan
-  may not honor it — check this form's settings in your Formspree dashboard;
-  if it's unsupported on your plan, forward manually from the primary inbox.
-- The first real submission on a freshly created Formspree form usually
-  needs a one-time confirmation click in your inbox before it starts
-  delivering silently.
+- The access key lives in `src/data/site.config.js` under `contact.web3formsAccessKey`.
+- Where the email actually lands is controlled by whichever email address
+  that access key was created with on web3forms.com — not in this codebase.
+- CC: a `ccemail` field is sent with each submission, but this is a **Web3Forms
+  PRO feature** — on the free plan it's very likely ignored. Check your
+  Web3Forms dashboard; if unsupported on your plan, forward manually from the
+  primary inbox instead.
+- Free plan allows up to 250 submissions/month and stores submissions for 30
+  days in their dashboard.
+
+### Spam protection (hCaptcha)
+The form includes Web3Forms' zero-config hCaptcha widget — no separate
+hCaptcha account or site key needed, it's proxied through Web3Forms using
+their shared free-plan key.
+
+- The widget renders via the `.h-captcha` div in `ContactForm.astro` plus the
+  `https://web3forms.com/client/script.js` script tag in `PortfolioLayout.astro`.
+- Submission is blocked client-side with a "Please complete the captcha"
+  message if it's not filled in, and the response token is sent along with
+  the rest of the form data.
+- **One manual step required**: log into your Web3Forms dashboard
+  (app.web3forms.com), open this form, and enable **hCaptcha** as the active
+  spam-block method. Without that toggle, the widget shows but Web3Forms
+  won't actually enforce it server-side.
+- hCaptcha's free checkbox can occasionally ask for an image challenge — this
+  is normal hCaptcha behavior, not something this codebase controls.
 
 ## Adding photos
 Drop the image into `public/images/`, then add an entry to the `gallery` array

@@ -1,7 +1,7 @@
 {
-    "name": "saanviportfolio",
-    "compatibility_date": "2026-07-14",
-    "assets": {
+  "name": "saanvi-portfolio",
+  "compatibility_date": "2026-07-14",
+  "assets": {
     "directory": "./dist"
   }
-}// wrangler.jsonc
+}

@@ -441,6 +441,8 @@ section + section { border-top: 1px solid var(--line); }
   outline-offset: 1px;
 }
 
+.h-captcha { margin: 4px 0 16px; }
+
 .contact-wrap .btn { width: 100%; margin-top: 4px; }
 
 .form-note {

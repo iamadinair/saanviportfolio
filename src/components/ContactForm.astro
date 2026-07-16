@@ -1,12 +1,15 @@
+---
+import { siteConfig } from '../data/site.config.js';
+---
 <section id="contact">
   <div class="container">
     <div class="section-head reveal">
       <p class="eyebrow">Booking inquiries</p>
       <h2>Get in touch</h2>
-      <p>Managed by my parents.</p>
+      <p>Managed by parent/guardian.</p>
     </div>
     <div class="contact-wrap reveal">
-      <form id="contact-form">
+      <form id="contact-form" data-access-key={siteConfig.contact.web3formsAccessKey} data-subject-prefix={siteConfig.contact.subjectPrefix} data-cc={siteConfig.contact.cc}>
         <div class="field">
           <label for="cf-name">Your name</label>
           <input type="text" id="cf-name" name="name" placeholder="Agency or casting director name" required>
@@ -27,6 +30,7 @@
           <label for="cf-message">Message</label>
           <textarea id="cf-message" name="message" rows="4" placeholder="Tell us about the opportunity" required></textarea>
         </div>
+        <div class="h-captcha" data-captcha="true"></div>
         <button type="submit" class="btn" id="cf-submit">Send inquiry</button>
       </form>
       <p class="form-note" id="cf-status"></p>
@@ -39,39 +43,59 @@
   const statusEl = document.getElementById('cf-status');
   const submitBtn = document.getElementById('cf-submit');
   const defaultStatus = statusEl.textContent;
+  const accessKey = form.dataset.accessKey;
+  const subjectPrefix = form.dataset.subjectPrefix || '';
+  const cc = form.dataset.cc;
 
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
+
+    const hCaptchaField = form.querySelector('textarea[name="h-captcha-response"]');
+    const hCaptchaToken = hCaptchaField ? hCaptchaField.value : '';
+    if (!hCaptchaToken) {
+      statusEl.textContent = 'Please complete the captcha before sending.';
+      return;
+    }
+
     submitBtn.disabled = true;
     submitBtn.textContent = 'Sending…';
     statusEl.textContent = defaultStatus;
 
+    const type = document.getElementById('cf-type').value;
     const payload = {
+      access_key: accessKey,
       name: document.getElementById('cf-name').value.trim(),
       email: document.getElementById('cf-email').value.trim(),
-      type: document.getElementById('cf-type').value,
+      type,
       message: document.getElementById('cf-message').value.trim(),
+      subject: `${subjectPrefix}${type}`,
+      ccemail: cc,
+      'h-captcha-response': hCaptchaToken,
     };
 
     try {
-      const res = await fetch('/api/contact', {
+      const res = await fetch('https://api.web3forms.com/submit', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+        },
         body: JSON.stringify(payload),
       });
-      const data = await res.json();
+      const data = await res.json().catch(() => ({}));
 
-      if (res.ok) {
+      if (res.ok && data.success) {
         statusEl.textContent = "Thanks — that's been sent. We'll be in touch soon.";
         form.reset();
       } else {
-        statusEl.textContent = data.error || 'Something went wrong sending that — please try again.';
+        statusEl.textContent = data.message || 'Something went wrong sending that — please try again.';
       }
     } catch (err) {
       statusEl.textContent = 'Network error — please try again in a moment.';
     } finally {
       submitBtn.disabled = false;
       submitBtn.textContent = 'Send inquiry';
+      if (window.hcaptcha) window.hcaptcha.reset();
     }
   });
 </script>

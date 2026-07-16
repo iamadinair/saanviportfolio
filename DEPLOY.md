@@ -11,7 +11,7 @@ When connecting the repo (Workers & Pages → Create → Pages → Connect to Gi
 - **Root directory**: leave blank unless this project lives in a subfolder of the repo
 
 No environment variables are needed — the contact form posts straight to
-Formspree from the browser, so there's no server secret to configure here.
+Web3Forms from the browser, so there's no server secret to configure here.
 
 ## Custom domain (saanvi.n4ir.com)
 1. Deploy once first and confirm the auto-generated `*.pages.dev` URL works.

@@ -8,8 +8,8 @@ interface Props {
 }
 
 const {
-  title = 'Saanvi Portfolio',
-  description = `${siteConfig.profile.age} · ${siteConfig.profile.location}`,
+  title = 'Saanvi — Kids Modelling Portfolio',
+  description = `${siteConfig.profile.ageRange} · ${siteConfig.profile.location}`,
 } = Astro.props;
 ---
 <!DOCTYPE html>
@@ -38,6 +38,9 @@ const {
 </head>
 <body>
   <slot />
+
+  <!-- Web3Forms hCaptcha widget (used by ContactForm.astro) -->
+  <script src="https://web3forms.com/client/script.js" async defer></script>
 
   <script>
     // Scroll-reveal: fade/slide sections and photo blocks in as they enter view.
