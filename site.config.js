@@ -83,9 +83,15 @@ export const siteConfig = {
       index: '04',
       caption: 'Everyday moments',
     },
+        {
+      src: '/images/gallery-saanvi-05-floral-dress.png',
+      alt: 'Saanvi in a flral dress, smiling at the camera',
+      index: '05',
+      caption: 'Happy times',
+    },
     {
       placeholder: true,
-      index: '05',
+      index: '06',
       caption: 'Next shoot',
     },
   ],
