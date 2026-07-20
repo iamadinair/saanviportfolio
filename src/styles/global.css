@@ -219,10 +219,22 @@ header.nav {
 }
 
 /* ===================================================================
-   CAROUSEL (images 2–5: horizontal, wheel-scrollable)
+   CAROUSEL (images 2–5): scroll-linked "pin" carousel.
+   Desktop: .carousel-pin-inner sticks in place while the section scrolls
+   past; JS translates .carousel-track horizontally in step with normal
+   page scroll (see PhotoCarousel.astro) — no wheel-event hijacking.
+   Narrow screens / reduced-motion: falls back to a plain native
+   horizontally-scrollable strip (.carousel-track--native), swipeable by touch.
 =================================================================== */
-.carousel-section {
+.carousel-pin-outer {
+  position: relative;
+}
+
+.carousel-pin-inner {
+  position: sticky;
+  top: 0;
   padding: 72px 0;
+  overflow: hidden;
 }
 
 .carousel-wrap {
@@ -253,14 +265,21 @@ header.nav {
 .carousel-track {
   display: flex;
   gap: 24px;
-  overflow-x: auto;
-  scroll-snap-type: x proximity;
   padding: 8px 8vw 28px;
-  scrollbar-width: thin;
+  will-change: transform;
 }
 
 @media (min-width: 900px) {
   .carousel-track { padding-left: 4rem; padding-right: 4rem; }
+}
+
+/* Fallback mode: JS adds this class when pin-scrolling is disabled
+   (narrow viewport or prefers-reduced-motion) */
+.carousel-track--native {
+  overflow-x: auto;
+  scroll-snap-type: x proximity;
+  scrollbar-width: thin;
+  transform: none !important;
 }
 
 .carousel-card {

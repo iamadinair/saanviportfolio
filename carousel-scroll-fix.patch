@@ -1,0 +1,232 @@
+diff --git a/src/components/PhotoCarousel.astro b/src/components/PhotoCarousel.astro
+index 279bc92..43d0c7f 100644
+--- a/src/components/PhotoCarousel.astro
++++ b/src/components/PhotoCarousel.astro
+@@ -2,73 +2,120 @@
+ import { siteConfig } from '../data/site.config.js';
+ const carouselItems = siteConfig.gallery.filter((item) => item.orientation !== 'landscape');
+ ---
+-<section id="carousel" class="carousel-section reveal">
+-  <div class="carousel-wrap">
+-    <button class="carousel-arrow carousel-arrow--prev" type="button" aria-label="Scroll to previous photo">
+-      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+-    </button>
++<section id="carousel-pin-outer" class="carousel-pin-outer reveal">
++  <div id="carousel-pin-inner" class="carousel-pin-inner">
++    <div class="carousel-wrap">
++      <button class="carousel-arrow carousel-arrow--prev" type="button" aria-label="Scroll to previous photo">
++        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
++      </button>
+ 
+-    <div class="carousel-track" id="carousel-track">
+-      {carouselItems.map((item) => (
+-        <figure class:list={['carousel-card', 'reveal', { 'carousel-card--placeholder': item.placeholder }]}>
+-          {item.placeholder ? (
+-            <div class="carousel-frame placeholder">
+-              <span>More photos<br />coming soon</span>
+-            </div>
+-          ) : (
+-            <div class="carousel-frame">
+-              <img src={item.src} alt={item.alt} loading="lazy" />
+-            </div>
+-          )}
+-          <figcaption>
+-            <span class="cap-index">{item.index}</span>
+-            <span class="cap-title">{item.caption}</span>
+-          </figcaption>
+-        </figure>
+-      ))}
+-    </div>
++      <div class="carousel-track" id="carousel-track">
++        {carouselItems.map((item) => (
++          <figure class:list={['carousel-card', { 'carousel-card--placeholder': item.placeholder }]}>
++            {item.placeholder ? (
++              <div class="carousel-frame placeholder">
++                <span>More photos<br />coming soon</span>
++              </div>
++            ) : (
++              <div class="carousel-frame">
++                <img src={item.src} alt={item.alt} loading="lazy" />
++              </div>
++            )}
++            <figcaption>
++              <span class="cap-index">{item.index}</span>
++              <span class="cap-title">{item.caption}</span>
++            </figcaption>
++          </figure>
++        ))}
++      </div>
+ 
+-    <button class="carousel-arrow carousel-arrow--next" type="button" aria-label="Scroll to next photo">
+-      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+-    </button>
++      <button class="carousel-arrow carousel-arrow--next" type="button" aria-label="Scroll to next photo">
++        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
++      </button>
++    </div>
+   </div>
+ </section>
+ 
+ <script>
++  // Scroll-linked "pin" carousel: normal page scroll the whole time, no wheel
++  // hijacking. While this section is scrolling past, it holds in place
++  // (position: sticky) and the track slides horizontally in proportion to
++  // scroll position; once it's exhausted, the section un-sticks and the
++  // page keeps scrolling normally. On narrow screens or when the visitor
++  // prefers reduced motion, it falls back to a plain native-scroll carousel.
++  const outer = document.getElementById('carousel-pin-outer');
++  const inner = document.getElementById('carousel-pin-inner');
+   const track = document.getElementById('carousel-track');
+   const prevBtn = document.querySelector('.carousel-arrow--prev');
+   const nextBtn = document.querySelector('.carousel-arrow--next');
+ 
+-  if (track) {
+-    // Turn vertical mouse-wheel motion into horizontal carousel scrolling
+-    // while the carousel still has room to move; once it's fully scrolled
+-    // in that direction, let the wheel resume scrolling the page normally.
+-    track.addEventListener(
+-      'wheel',
+-      (e) => {
+-        const atStart = track.scrollLeft <= 0;
+-        const atEnd = track.scrollLeft + track.clientWidth >= track.scrollWidth - 1;
+-        const scrollingDown = e.deltaY > 0;
+-        const scrollingUp = e.deltaY < 0;
++  const canPin = () =>
++    window.matchMedia('(min-width: 900px)').matches &&
++    window.matchMedia('(prefers-reduced-motion: no-preference)').matches;
++
++  let pinEnabled = false;
++  let maxScroll = 0;
++  let ticking = false;
++
++  const cardStep = () => {
++    const card = track.querySelector('.carousel-card');
++    return card ? card.getBoundingClientRect().width + 24 : 320;
++  };
++
++  function measure() {
++    pinEnabled = canPin();
++
++    if (!pinEnabled) {
++      outer.style.height = '';
++      track.style.transform = '';
++      track.classList.add('carousel-track--native');
++      return;
++    }
+ 
+-        if ((scrollingDown && !atEnd) || (scrollingUp && !atStart)) {
+-          e.preventDefault();
+-          track.scrollLeft += e.deltaY * 1.4;
+-        }
+-      },
+-      { passive: false }
+-    );
++    track.classList.remove('carousel-track--native');
++    maxScroll = Math.max(0, track.scrollWidth - track.clientWidth);
++    outer.style.height = `${inner.offsetHeight + maxScroll}px`;
++  }
++
++  function onScroll() {
++    if (!pinEnabled || maxScroll <= 0) return;
++    if (ticking) return;
++    ticking = true;
++    requestAnimationFrame(() => {
++      const rect = outer.getBoundingClientRect();
++      const scrolled = -rect.top;
++      const progress = Math.min(Math.max(scrolled / maxScroll, 0), 1);
++      track.style.transform = `translateX(-${progress * maxScroll}px)`;
++      ticking = false;
++    });
++  }
+ 
+-    const cardWidth = () => {
+-      const card = track.querySelector('.carousel-card');
+-      return card ? card.getBoundingClientRect().width + 20 : 320;
+-    };
++  if (outer && inner && track) {
++    measure();
++    onScroll();
++    window.addEventListener('scroll', onScroll, { passive: true });
++    window.addEventListener('resize', () => {
++      measure();
++      onScroll();
++    });
++    window.addEventListener('load', () => {
++      measure();
++      onScroll();
++    });
+ 
+     prevBtn?.addEventListener('click', () => {
+-      track.scrollBy({ left: -cardWidth(), behavior: 'smooth' });
++      if (pinEnabled) {
++        window.scrollBy({ top: -cardStep(), behavior: 'smooth' });
++      } else {
++        track.scrollBy({ left: -cardStep(), behavior: 'smooth' });
++      }
+     });
+     nextBtn?.addEventListener('click', () => {
+-      track.scrollBy({ left: cardWidth(), behavior: 'smooth' });
++      if (pinEnabled) {
++        window.scrollBy({ top: cardStep(), behavior: 'smooth' });
++      } else {
++        track.scrollBy({ left: cardStep(), behavior: 'smooth' });
++      }
+     });
+   }
+ </script>
+diff --git a/src/styles/global.css b/src/styles/global.css
+index 3d3ca73..4eed3c6 100644
+--- a/src/styles/global.css
++++ b/src/styles/global.css
+@@ -219,10 +219,22 @@ header.nav {
+ }
+ 
+ /* ===================================================================
+-   CAROUSEL (images 2–5: horizontal, wheel-scrollable)
++   CAROUSEL (images 2–5): scroll-linked "pin" carousel.
++   Desktop: .carousel-pin-inner sticks in place while the section scrolls
++   past; JS translates .carousel-track horizontally in step with normal
++   page scroll (see PhotoCarousel.astro) — no wheel-event hijacking.
++   Narrow screens / reduced-motion: falls back to a plain native
++   horizontally-scrollable strip (.carousel-track--native), swipeable by touch.
+ =================================================================== */
+-.carousel-section {
++.carousel-pin-outer {
++  position: relative;
++}
++
++.carousel-pin-inner {
++  position: sticky;
++  top: 0;
+   padding: 72px 0;
++  overflow: hidden;
+ }
+ 
+ .carousel-wrap {
+@@ -253,16 +265,23 @@ header.nav {
+ .carousel-track {
+   display: flex;
+   gap: 24px;
+-  overflow-x: auto;
+-  scroll-snap-type: x proximity;
+   padding: 8px 8vw 28px;
+-  scrollbar-width: thin;
++  will-change: transform;
+ }
+ 
+ @media (min-width: 900px) {
+   .carousel-track { padding-left: 4rem; padding-right: 4rem; }
+ }
+ 
++/* Fallback mode: JS adds this class when pin-scrolling is disabled
++   (narrow viewport or prefers-reduced-motion) */
++.carousel-track--native {
++  overflow-x: auto;
++  scroll-snap-type: x proximity;
++  scrollbar-width: thin;
++  transform: none !important;
++}
++
+ .carousel-card {
+   flex: 0 0 auto;
+   width: min(72vw, 360px);
