@@ -2,9 +2,9 @@
 import { siteConfig } from '../data/site.config.js';
 const landscapeItems = siteConfig.gallery.filter((item) => item.orientation === 'landscape');
 ---
-<section id="gallery" class="photo-sequence">
-  {landscapeItems.map((item) => (
-    <figure class="photo-block reveal photo-block--landscape">
+{landscapeItems.map((item) => (
+  <section id={`gallery-${item.index}`} class="photo-block-section reveal">
+    <figure class="photo-block photo-block--landscape">
       <div class="photo-block-frame">
         <img src={item.src} alt={item.alt} />
       </div>
@@ -13,5 +13,5 @@ const landscapeItems = siteConfig.gallery.filter((item) => item.orientation === 
         <span class="cap-title">{item.caption}</span>
       </figcaption>
     </figure>
-  ))}
-</section>
+  </section>
+))}

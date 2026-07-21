@@ -60,6 +60,113 @@ const {
         revealEls.forEach((el) => el.classList.add('is-visible'));
       }
     });
+
+    // Full-page slide navigation: each top-level section (hero, each
+    // landscape photo, the carousel, bio, comp card, contact, footer) acts
+    // as its own "slide" — one deliberate scroll gesture moves cleanly to
+    // the next/previous one, using an animated scrollTo rather than relying
+    // on native CSS scroll-snap (which doesn't reliably advance on small
+    // wheel deltas — a single mouse-wheel notch is often smaller than the
+    // ~50% threshold browsers use, so it can snap back to the start instead
+    // of moving forward).
+    //
+    // The carousel is a special case: while it still has unexhausted
+    // horizontal travel in the scrolled direction, wheel events are left
+    // completely alone (no preventDefault) so its own scroll-linked pin
+    // logic (in PhotoCarousel.astro) keeps working exactly as before. Only
+    // once the carousel is exhausted in that direction does this take over
+    // and jump to the next/previous slide.
+    document.addEventListener('DOMContentLoaded', () => {
+      const slideSelector =
+        '.hero, .photo-block-section, #carousel-pin-outer, #about, #compcard-section, #contact, footer';
+
+      const canSlideNav = () =>
+        window.matchMedia('(min-width: 900px)').matches &&
+        window.matchMedia('(prefers-reduced-motion: no-preference)').matches;
+
+      let slides = [];
+      let animating = false;
+
+      function refreshSlides() {
+        slides = Array.from(document.querySelectorAll(slideSelector));
+      }
+
+      function currentIndex() {
+        const y = window.scrollY + 2;
+        let idx = 0;
+        for (let i = 0; i < slides.length; i++) {
+          if (slides[i].offsetTop <= y) idx = i;
+        }
+        return idx;
+      }
+
+      function goToSlide(index) {
+        if (index < 0 || index >= slides.length) return;
+        animating = true;
+        const target = slides[index].offsetTop;
+        window.scrollTo({ top: target, behavior: 'smooth' });
+
+        // Detect actual scroll completion (scrollY stops changing) rather
+        // than guessing a fixed duration — native smooth-scroll takes
+        // longer for bigger jumps, and a mistimed fixed delay could let a
+        // new wheel event interrupt mid-flight and land somewhere wrong.
+        let lastY = window.scrollY;
+        let stableFrames = 0;
+        const startedAt = performance.now();
+
+        function checkDone() {
+          const y = window.scrollY;
+          const closeEnough = Math.abs(y - target) < 2;
+          const stalled = Math.abs(y - lastY) < 1;
+          stableFrames = stalled ? stableFrames + 1 : 0;
+          lastY = y;
+
+          const timedOut = performance.now() - startedAt > 2000; // safety net
+          if (closeEnough || stableFrames > 4 || timedOut) {
+            animating = false;
+            return;
+          }
+          requestAnimationFrame(checkDone);
+        }
+        requestAnimationFrame(checkDone);
+      }
+
+      function carouselExhausted(direction) {
+        const track = document.getElementById('carousel-track');
+        if (!track) return true;
+        const maxScroll = Math.max(0, track.scrollWidth - track.clientWidth);
+        if (maxScroll <= 0) return true;
+        const matrix = new DOMMatrixReadOnly(getComputedStyle(track).transform);
+        const translated = Math.abs(matrix.m41 || 0);
+        return direction > 0 ? translated >= maxScroll - 1 : translated <= 1;
+      }
+
+      function onWheel(e) {
+        if (!canSlideNav()) return;
+        if (animating) {
+          e.preventDefault();
+          return;
+        }
+
+        refreshSlides();
+        const idx = currentIndex();
+        const active = slides[idx];
+        const direction = e.deltaY > 0 ? 1 : -1;
+
+        if (active && active.id === 'carousel-pin-outer' && !carouselExhausted(direction)) {
+          // Still room to move horizontally — let native scroll (and the
+          // carousel's own listener) handle this event untouched.
+          return;
+        }
+
+        e.preventDefault();
+        goToSlide(idx + direction);
+      }
+
+      refreshSlides();
+      window.addEventListener('wheel', onWheel, { passive: false });
+      window.addEventListener('resize', refreshSlides);
+    });
   </script>
 </body>
 </html>

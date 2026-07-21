@@ -1,0 +1,284 @@
+diff --git a/src/components/PhotoSequence.astro b/src/components/PhotoSequence.astro
+index 4259280..181ea8e 100644
+--- a/src/components/PhotoSequence.astro
++++ b/src/components/PhotoSequence.astro
+@@ -2,9 +2,9 @@
+ import { siteConfig } from '../data/site.config.js';
+ const landscapeItems = siteConfig.gallery.filter((item) => item.orientation === 'landscape');
+ ---
+-<section id="gallery" class="photo-sequence">
+-  {landscapeItems.map((item) => (
+-    <figure class="photo-block reveal photo-block--landscape">
++{landscapeItems.map((item) => (
++  <section id={`gallery-${item.index}`} class="photo-block-section reveal">
++    <figure class="photo-block photo-block--landscape">
+       <div class="photo-block-frame">
+         <img src={item.src} alt={item.alt} />
+       </div>
+@@ -13,5 +13,5 @@ const landscapeItems = siteConfig.gallery.filter((item) => item.orientation ===
+         <span class="cap-title">{item.caption}</span>
+       </figcaption>
+     </figure>
+-  ))}
+-</section>
++  </section>
++))}
+diff --git a/src/layouts/PortfolioLayout.astro b/src/layouts/PortfolioLayout.astro
+index a75afe8..be5ee8f 100644
+--- a/src/layouts/PortfolioLayout.astro
++++ b/src/layouts/PortfolioLayout.astro
+@@ -60,6 +60,113 @@ const {
+         revealEls.forEach((el) => el.classList.add('is-visible'));
+       }
+     });
++
++    // Full-page slide navigation: each top-level section (hero, each
++    // landscape photo, the carousel, bio, comp card, contact, footer) acts
++    // as its own "slide" — one deliberate scroll gesture moves cleanly to
++    // the next/previous one, using an animated scrollTo rather than relying
++    // on native CSS scroll-snap (which doesn't reliably advance on small
++    // wheel deltas — a single mouse-wheel notch is often smaller than the
++    // ~50% threshold browsers use, so it can snap back to the start instead
++    // of moving forward).
++    //
++    // The carousel is a special case: while it still has unexhausted
++    // horizontal travel in the scrolled direction, wheel events are left
++    // completely alone (no preventDefault) so its own scroll-linked pin
++    // logic (in PhotoCarousel.astro) keeps working exactly as before. Only
++    // once the carousel is exhausted in that direction does this take over
++    // and jump to the next/previous slide.
++    document.addEventListener('DOMContentLoaded', () => {
++      const slideSelector =
++        '.hero, .photo-block-section, #carousel-pin-outer, #about, #compcard-section, #contact, footer';
++
++      const canSlideNav = () =>
++        window.matchMedia('(min-width: 900px)').matches &&
++        window.matchMedia('(prefers-reduced-motion: no-preference)').matches;
++
++      let slides = [];
++      let animating = false;
++
++      function refreshSlides() {
++        slides = Array.from(document.querySelectorAll(slideSelector));
++      }
++
++      function currentIndex() {
++        const y = window.scrollY + 2;
++        let idx = 0;
++        for (let i = 0; i < slides.length; i++) {
++          if (slides[i].offsetTop <= y) idx = i;
++        }
++        return idx;
++      }
++
++      function goToSlide(index) {
++        if (index < 0 || index >= slides.length) return;
++        animating = true;
++        const target = slides[index].offsetTop;
++        window.scrollTo({ top: target, behavior: 'smooth' });
++
++        // Detect actual scroll completion (scrollY stops changing) rather
++        // than guessing a fixed duration — native smooth-scroll takes
++        // longer for bigger jumps, and a mistimed fixed delay could let a
++        // new wheel event interrupt mid-flight and land somewhere wrong.
++        let lastY = window.scrollY;
++        let stableFrames = 0;
++        const startedAt = performance.now();
++
++        function checkDone() {
++          const y = window.scrollY;
++          const closeEnough = Math.abs(y - target) < 2;
++          const stalled = Math.abs(y - lastY) < 1;
++          stableFrames = stalled ? stableFrames + 1 : 0;
++          lastY = y;
++
++          const timedOut = performance.now() - startedAt > 2000; // safety net
++          if (closeEnough || stableFrames > 4 || timedOut) {
++            animating = false;
++            return;
++          }
++          requestAnimationFrame(checkDone);
++        }
++        requestAnimationFrame(checkDone);
++      }
++
++      function carouselExhausted(direction) {
++        const track = document.getElementById('carousel-track');
++        if (!track) return true;
++        const maxScroll = Math.max(0, track.scrollWidth - track.clientWidth);
++        if (maxScroll <= 0) return true;
++        const matrix = new DOMMatrixReadOnly(getComputedStyle(track).transform);
++        const translated = Math.abs(matrix.m41 || 0);
++        return direction > 0 ? translated >= maxScroll - 1 : translated <= 1;
++      }
++
++      function onWheel(e) {
++        if (!canSlideNav()) return;
++        if (animating) {
++          e.preventDefault();
++          return;
++        }
++
++        refreshSlides();
++        const idx = currentIndex();
++        const active = slides[idx];
++        const direction = e.deltaY > 0 ? 1 : -1;
++
++        if (active && active.id === 'carousel-pin-outer' && !carouselExhausted(direction)) {
++          // Still room to move horizontally — let native scroll (and the
++          // carousel's own listener) handle this event untouched.
++          return;
++        }
++
++        e.preventDefault();
++        goToSlide(idx + direction);
++      }
++
++      refreshSlides();
++      window.addEventListener('wheel', onWheel, { passive: false });
++      window.addEventListener('resize', refreshSlides);
++    });
+   </script>
+ </body>
+ </html>
+diff --git a/src/styles/global.css b/src/styles/global.css
+index 4eed3c6..81781df 100644
+--- a/src/styles/global.css
++++ b/src/styles/global.css
+@@ -136,7 +136,11 @@ header.nav {
+    HERO
+ =================================================================== */
+ .hero {
+-  padding: 96px 0 64px;
++  min-height: 100vh;
++  padding: 48px 0;
++  display: flex;
++  flex-direction: column;
++  justify-content: center;
+   text-align: center;
+ }
+ 
+@@ -155,18 +159,20 @@ header.nav {
+ }
+ 
+ /* ===================================================================
+-   FULL-BLEED PHOTO SEQUENCE (Lia Vasilek style: scroll through large,
+-   named photos one after another)
++   FULL-BLEED PHOTO SLIDE(S) (Lia Vasilek style). Each landscape photo in
++   site.config.js becomes its own top-level, full-viewport snap slide.
+ =================================================================== */
+-.photo-sequence {
++.photo-block-section {
++  min-height: 100vh;
+   display: flex;
+-  flex-direction: column;
+-  gap: 4px;
++  align-items: center;
++  padding: 0;
+ }
+ 
+ .photo-block {
+   margin: 0;
+   position: relative;
++  width: 100%;
+ }
+ 
+ /* ---- Landscape: full-bleed hero treatment ---- */
+@@ -233,12 +239,15 @@ header.nav {
+ .carousel-pin-inner {
+   position: sticky;
+   top: 0;
+-  padding: 72px 0;
++  height: 100vh;
++  display: flex;
++  align-items: center;
+   overflow: hidden;
+ }
+ 
+ .carousel-wrap {
+   position: relative;
++  width: 100%;
+ }
+ 
+ .carousel-wrap::before,
+@@ -362,7 +371,6 @@ header.nav {
+    SECTION SPACING
+ =================================================================== */
+ section { padding: 96px 0; }
+-#gallery { padding: 0; }
+ section + section { border-top: 1px solid var(--line); }
+ 
+ .section-head {
+@@ -384,6 +392,14 @@ section + section { border-top: 1px solid var(--line); }
+ /* ===================================================================
+    ABOUT / BIO
+ =================================================================== */
++#about {
++  min-height: 100vh;
++  padding: 48px 0;
++  display: flex;
++  align-items: center;
++  justify-content: center;
++}
++
+ .about-wrap {
+   max-width: 680px;
+   text-align: center;
+@@ -406,6 +422,14 @@ section + section { border-top: 1px solid var(--line); }
+ /* ===================================================================
+    COMP CARD
+ =================================================================== */
++#compcard-section {
++  min-height: 100vh;
++  padding: 48px 0;
++  display: flex;
++  align-items: center;
++  justify-content: center;
++}
++
+ .compcard-box {
+   max-width: 480px;
+   margin: 0 auto;
+@@ -424,6 +448,18 @@ section + section { border-top: 1px solid var(--line); }
+ /* ===================================================================
+    CONTACT
+ =================================================================== */
++#contact {
++  min-height: 100vh;
++  padding: 48px 0;
++  display: flex;
++  align-items: center;
++  justify-content: center;
++}
++
++#contact .container {
++  width: 100%;
++}
++
+ .contact-wrap {
+   max-width: 460px;
+   margin: 0 auto;
+@@ -508,19 +544,19 @@ footer {
+   transform: translateY(0);
+ }
+ 
+-.photo-block.reveal {
++.photo-block-section.reveal {
+   transform: none;
+ }
+-.photo-block.reveal .photo-block-frame {
++.photo-block-section.reveal .photo-block-frame {
+   opacity: 0;
+   transition: opacity 1s ease;
+ }
+-.photo-block.reveal.is-visible .photo-block-frame {
++.photo-block-section.reveal.is-visible .photo-block-frame {
+   opacity: 1;
+ }
+ 
+ @media (prefers-reduced-motion: reduce) {
+   html { scroll-behavior: auto; }
+-  .reveal, .photo-block.reveal .photo-block-frame { opacity: 1; transform: none; transition: none; }
++  .reveal, .photo-block-section.reveal .photo-block-frame { opacity: 1; transform: none; transition: none; }
+   .photo-block-frame img { transition: none; }
+ }
