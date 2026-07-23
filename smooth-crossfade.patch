@@ -1,0 +1,562 @@
+diff --git a/src/components/Bio.astro b/src/components/Bio.astro
+index 95789a2..f0c0a83 100644
+--- a/src/components/Bio.astro
++++ b/src/components/Bio.astro
+@@ -6,16 +6,18 @@ const temperamentLine = profile.temperamentNotes
+   .map((n) => n.toLowerCase())
+   .join(' and ');
+ ---
+-<section id="about">
+-  <div class="container about-wrap reveal">
+-    <p class="eyebrow">About</p>
+-    <p class="bio">
+-      I'm <span>{profile.name}</span>, <span>{profile.ageRange}</span> old and based in
+-      <span>{profile.location}</span>. I stand at <span>{profile.stats.height}</span> tall,
+-      weigh <span>{profile.stats.weight}</span>, and wear size <span>{profile.stats.clothingSize}</span> clothing, with
+-      <span>{profile.stats.eyeColour.toLowerCase()}</span> eyes and <span>{profile.stats.hairColour.toLowerCase()}</span> hair. I'm
+-      <span>{temperamentLine}</span>. Managed by my parents — always happy to hear from
+-      agencies and photographers looking to collaborate.
+-    </p>
++<section id="about" class="slide-panel">
++  <div class="slide-exit-inner">
++    <div class="container about-wrap">
++      <p class="eyebrow">About</p>
++      <p class="bio">
++        I'm <span>{profile.name}</span>, <span>{profile.ageRange}</span> old and based in
++        <span>{profile.location}</span>. I stand at <span>{profile.stats.height}</span> tall,
++        weigh <span>{profile.stats.weight}</span>, and wear size <span>{profile.stats.clothingSize}</span> clothing, with
++        <span>{profile.stats.eyeColour.toLowerCase()}</span> eyes and <span>{profile.stats.hairColour.toLowerCase()}</span> hair. I'm
++        <span>{temperamentLine}</span>. Managed by my parents — always happy to hear from
++        agencies and photographers looking to collaborate.
++      </p>
++    </div>
+   </div>
+ </section>
+diff --git a/src/components/CompCard.astro b/src/components/CompCard.astro
+index 7d12105..09f29f5 100644
+--- a/src/components/CompCard.astro
++++ b/src/components/CompCard.astro
+@@ -1,15 +1,17 @@
+ ---
+ import { siteConfig } from '../data/site.config.js';
+ ---
+-<section id="compcard-section">
+-  <div class="container">
+-    <div class="section-head reveal">
+-      <p class="eyebrow">For casting directors</p>
+-      <h2 id="compcard">Comp card</h2>
+-    </div>
+-    <div class="compcard-box reveal">
+-      <p>One page, ready to download and pass along.</p>
+-      <a class="btn" href={siteConfig.compCardPdfPath} download>Download comp card</a>
++<section id="compcard-section" class="slide-panel">
++  <div class="slide-exit-inner">
++    <div class="container">
++      <div class="section-head">
++        <p class="eyebrow">For casting directors</p>
++        <h2 id="compcard">Comp card</h2>
++      </div>
++      <div class="compcard-box">
++        <p>One page, ready to download and pass along.</p>
++        <a class="btn" href={siteConfig.compCardPdfPath} download>Download comp card</a>
++      </div>
+     </div>
+   </div>
+ </section>
+diff --git a/src/components/ContactForm.astro b/src/components/ContactForm.astro
+index b3857db..8adb0fa 100644
+--- a/src/components/ContactForm.astro
++++ b/src/components/ContactForm.astro
+@@ -1,39 +1,41 @@
+ ---
+ import { siteConfig } from '../data/site.config.js';
+ ---
+-<section id="contact">
+-  <div class="container">
+-    <div class="section-head reveal">
+-      <p class="eyebrow">Booking inquiries</p>
+-      <h2>Get in touch</h2>
+-      <p>Managed by parent/guardian.</p>
+-    </div>
+-    <div class="contact-wrap reveal">
+-      <form id="contact-form" data-access-key={siteConfig.contact.web3formsAccessKey} data-subject-prefix={siteConfig.contact.subjectPrefix} data-cc={siteConfig.contact.cc}>
+-        <div class="field">
+-          <label for="cf-name">Your name</label>
+-          <input type="text" id="cf-name" name="name" placeholder="Agency or casting director name" required>
+-        </div>
+-        <div class="field">
+-          <label for="cf-email">Email</label>
+-          <input type="email" id="cf-email" name="email" placeholder="name@agency.com" required>
+-        </div>
+-        <div class="field">
+-          <label for="cf-type">Inquiry type</label>
+-          <select id="cf-type" name="type">
+-            <option>Casting opportunity</option>
+-            <option>Photoshoot request</option>
+-            <option>General inquiry</option>
+-          </select>
+-        </div>
+-        <div class="field">
+-          <label for="cf-message">Message</label>
+-          <textarea id="cf-message" name="message" rows="4" placeholder="Tell us about the opportunity" required></textarea>
+-        </div>
+-        <div class="h-captcha" data-captcha="true"></div>
+-        <button type="submit" class="btn" id="cf-submit">Send inquiry</button>
+-      </form>
+-      <p class="form-note" id="cf-status"></p>
++<section id="contact" class="slide-panel">
++  <div class="slide-exit-inner">
++    <div class="container">
++      <div class="section-head">
++        <p class="eyebrow">Booking inquiries</p>
++        <h2>Get in touch</h2>
++        <p>Managed by parent/guardian.</p>
++      </div>
++      <div class="contact-wrap">
++        <form id="contact-form" data-access-key={siteConfig.contact.web3formsAccessKey} data-subject-prefix={siteConfig.contact.subjectPrefix} data-cc={siteConfig.contact.cc}>
++          <div class="field">
++            <label for="cf-name">Your name</label>
++            <input type="text" id="cf-name" name="name" placeholder="Agency or casting director name" required>
++          </div>
++          <div class="field">
++            <label for="cf-email">Email</label>
++            <input type="email" id="cf-email" name="email" placeholder="name@agency.com" required>
++          </div>
++          <div class="field">
++            <label for="cf-type">Inquiry type</label>
++            <select id="cf-type" name="type">
++              <option>Casting opportunity</option>
++              <option>Photoshoot request</option>
++              <option>General inquiry</option>
++            </select>
++          </div>
++          <div class="field">
++            <label for="cf-message">Message</label>
++            <textarea id="cf-message" name="message" rows="4" placeholder="Tell us about the opportunity" required></textarea>
++          </div>
++          <div class="h-captcha" data-captcha="true"></div>
++          <button type="submit" class="btn" id="cf-submit">Send inquiry</button>
++        </form>
++        <p class="form-note" id="cf-status"></p>
++      </div>
+     </div>
+   </div>
+ </section>
+diff --git a/src/components/Footer.astro b/src/components/Footer.astro
+index 49ba210..9ddf9aa 100644
+--- a/src/components/Footer.astro
++++ b/src/components/Footer.astro
+@@ -2,7 +2,7 @@
+ import { siteConfig } from '../data/site.config.js';
+ ---
+ <footer>
+-  <div class="container footer-inner">
++  <div class="container footer-inner slide-fade-in">
+     <span>&copy; {new Date().getFullYear()} {siteConfig.profile.name}'s portfolio.</span>
+     {siteConfig.instagram && (
+       <a href={siteConfig.instagram} target="_blank" rel="noopener">Instagram ↗</a>
+diff --git a/src/components/Hero.astro b/src/components/Hero.astro
+index 9d7fdd7..cf28757 100644
+--- a/src/components/Hero.astro
++++ b/src/components/Hero.astro
+@@ -1,10 +1,12 @@
+ ---
+ import { siteConfig } from '../data/site.config.js';
+ ---
+-<section class="hero">
+-  <div class="container">
+-    <p class="eyebrow">Kids modelling portfolio</p>
+-    <h1>Hi, I'm {siteConfig.profile.name}</h1>
+-    <p class="hero-sub">As you scroll, meet a little face full of personality.</p>
++<section class="hero slide-panel">
++  <div class="slide-exit-inner">
++    <div class="container">
++      <p class="eyebrow">Kids modelling portfolio</p>
++      <h1>Hi, I'm {siteConfig.profile.name}</h1>
++      <p class="hero-sub">As you scroll, meet a little face full of personality.</p>
++    </div>
+   </div>
+ </section>
+diff --git a/src/components/PhotoCarousel.astro b/src/components/PhotoCarousel.astro
+index 43d0c7f..5114d6c 100644
+--- a/src/components/PhotoCarousel.astro
++++ b/src/components/PhotoCarousel.astro
+@@ -2,8 +2,8 @@
+ import { siteConfig } from '../data/site.config.js';
+ const carouselItems = siteConfig.gallery.filter((item) => item.orientation !== 'landscape');
+ ---
+-<section id="carousel-pin-outer" class="carousel-pin-outer reveal">
+-  <div id="carousel-pin-inner" class="carousel-pin-inner">
++<section id="carousel-pin-outer" class="carousel-pin-outer">
++  <div id="carousel-pin-inner" class="carousel-pin-inner slide-fade-in">
+     <div class="carousel-wrap">
+       <button class="carousel-arrow carousel-arrow--prev" type="button" aria-label="Scroll to previous photo">
+         <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+diff --git a/src/components/PhotoSequence.astro b/src/components/PhotoSequence.astro
+index 181ea8e..849ed31 100644
+--- a/src/components/PhotoSequence.astro
++++ b/src/components/PhotoSequence.astro
+@@ -3,15 +3,17 @@ import { siteConfig } from '../data/site.config.js';
+ const landscapeItems = siteConfig.gallery.filter((item) => item.orientation === 'landscape');
+ ---
+ {landscapeItems.map((item) => (
+-  <section id={`gallery-${item.index}`} class="photo-block-section reveal">
+-    <figure class="photo-block photo-block--landscape">
+-      <div class="photo-block-frame">
+-        <img src={item.src} alt={item.alt} />
+-      </div>
+-      <figcaption>
+-        <span class="cap-index">{item.index}</span>
+-        <span class="cap-title">{item.caption}</span>
+-      </figcaption>
+-    </figure>
++  <section id={`gallery-${item.index}`} class="photo-block-section slide-panel">
++    <div class="slide-exit-inner">
++      <figure class="photo-block photo-block--landscape">
++        <div class="photo-block-frame">
++          <img src={item.src} alt={item.alt} />
++        </div>
++        <figcaption>
++          <span class="cap-index">{item.index}</span>
++          <span class="cap-title">{item.caption}</span>
++        </figcaption>
++      </figure>
++    </div>
+   </section>
+ ))}
+diff --git a/src/layouts/PortfolioLayout.astro b/src/layouts/PortfolioLayout.astro
+index be5ee8f..fbb2db2 100644
+--- a/src/layouts/PortfolioLayout.astro
++++ b/src/layouts/PortfolioLayout.astro
+@@ -61,111 +61,85 @@ const {
+       }
+     });
+ 
+-    // Full-page slide navigation: each top-level section (hero, each
+-    // landscape photo, the carousel, bio, comp card, contact, footer) acts
+-    // as its own "slide" — one deliberate scroll gesture moves cleanly to
+-    // the next/previous one, using an animated scrollTo rather than relying
+-    // on native CSS scroll-snap (which doesn't reliably advance on small
+-    // wheel deltas — a single mouse-wheel notch is often smaller than the
+-    // ~50% threshold browsers use, so it can snap back to the start instead
+-    // of moving forward).
+-    //
+-    // The carousel is a special case: while it still has unexhausted
+-    // horizontal travel in the scrolled direction, wheel events are left
+-    // completely alone (no preventDefault) so its own scroll-linked pin
+-    // logic (in PhotoCarousel.astro) keeps working exactly as before. Only
+-    // once the carousel is exhausted in that direction does this take over
+-    // and jump to the next/previous slide.
++    // Scroll-linked section transitions: as each full-viewport section is
++    // scrolled past, its content gracefully fades and lifts away while the
++    // next section's content simultaneously settles into place — driven
++    // entirely by scroll position (the same technique already used for the
++    // carousel's horizontal movement), never by a fixed-speed canned
++    // animation. This never calls preventDefault or scrollTo — it only
++    // reads scroll position and applies a transform in response — so it
++    // can't get "stuck" and works identically with mouse, trackpad, or touch.
+     document.addEventListener('DOMContentLoaded', () => {
+-      const slideSelector =
+-        '.hero, .photo-block-section, #carousel-pin-outer, #about, #compcard-section, #contact, footer';
+-
+-      const canSlideNav = () =>
+-        window.matchMedia('(min-width: 900px)').matches &&
+-        window.matchMedia('(prefers-reduced-motion: no-preference)').matches;
+-
+-      let slides = [];
+-      let animating = false;
+-
+-      function refreshSlides() {
+-        slides = Array.from(document.querySelectorAll(slideSelector));
+-      }
+-
+-      function currentIndex() {
+-        const y = window.scrollY + 2;
+-        let idx = 0;
+-        for (let i = 0; i < slides.length; i++) {
+-          if (slides[i].offsetTop <= y) idx = i;
++      const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
++      if (prefersReducedMotion) return;
++
++      // The fade/lift window is set to exactly half the viewport height.
++      // Since every full-viewport section is exactly 100vh tall, this makes
++      // the outgoing section's fade-out complete at precisely the same
++      // scroll position where the incoming section's fade-in begins — a
++      // seamless handoff with no gap where both are invisible, and no
++      // "dead" extra scroll distance added anywhere.
++      let budget = window.innerHeight / 2;
++      const lift = 56;
++      const clamp = (v, min, max) => Math.min(Math.max(v, min), max);
++      const navEl = document.querySelector('header.nav');
++      const navOffset = () => (navEl ? navEl.offsetHeight : 0);
++
++      // Sections with their own extra scroll budget: fade+lift out at the
++      // end (exit), fade+settle in at the start (entrance) — both driven
++      // by the same outer element's position, so no cross-element state.
++      const panels = Array.from(document.querySelectorAll('.slide-panel')).map((panel) => ({
++        panel,
++        inner: panel.querySelector(':scope > .slide-exit-inner'),
++      })).filter((p) => p.inner);
++
++      // Elements with an entrance-only fade (footer, the carousel) — no
++      // budget of their own, they simply settle in as they scroll up from
++      // below, then stay put.
++      const fadeIns = Array.from(document.querySelectorAll('.slide-fade-in'));
++
++      function updatePanel({ panel, inner }) {
++        const top = panel.getBoundingClientRect().top - navOffset();
++        let opacity;
++        let translateY;
++        if (top >= 0) {
++          const v = clamp(1 - top / budget, 0, 1);
++          opacity = v;
++          translateY = (1 - v) * lift;
++        } else {
++          const w = clamp(-top / budget, 0, 1);
++          opacity = 1 - w;
++          translateY = -w * lift;
+         }
+-        return idx;
++        inner.style.opacity = String(opacity);
++        inner.style.transform = `translateY(${translateY}px)`;
+       }
+ 
+-      function goToSlide(index) {
+-        if (index < 0 || index >= slides.length) return;
+-        animating = true;
+-        const target = slides[index].offsetTop;
+-        window.scrollTo({ top: target, behavior: 'smooth' });
+-
+-        // Detect actual scroll completion (scrollY stops changing) rather
+-        // than guessing a fixed duration — native smooth-scroll takes
+-        // longer for bigger jumps, and a mistimed fixed delay could let a
+-        // new wheel event interrupt mid-flight and land somewhere wrong.
+-        let lastY = window.scrollY;
+-        let stableFrames = 0;
+-        const startedAt = performance.now();
+-
+-        function checkDone() {
+-          const y = window.scrollY;
+-          const closeEnough = Math.abs(y - target) < 2;
+-          const stalled = Math.abs(y - lastY) < 1;
+-          stableFrames = stalled ? stableFrames + 1 : 0;
+-          lastY = y;
+-
+-          const timedOut = performance.now() - startedAt > 2000; // safety net
+-          if (closeEnough || stableFrames > 4 || timedOut) {
+-            animating = false;
+-            return;
+-          }
+-          requestAnimationFrame(checkDone);
+-        }
+-        requestAnimationFrame(checkDone);
++      function updateFadeIn(el) {
++        const top = el.getBoundingClientRect().top - navOffset();
++        const v = clamp(1 - top / budget, 0, 1);
++        el.style.opacity = String(v);
++        el.style.transform = `translateY(${(1 - v) * lift}px)`;
+       }
+ 
+-      function carouselExhausted(direction) {
+-        const track = document.getElementById('carousel-track');
+-        if (!track) return true;
+-        const maxScroll = Math.max(0, track.scrollWidth - track.clientWidth);
+-        if (maxScroll <= 0) return true;
+-        const matrix = new DOMMatrixReadOnly(getComputedStyle(track).transform);
+-        const translated = Math.abs(matrix.m41 || 0);
+-        return direction > 0 ? translated >= maxScroll - 1 : translated <= 1;
++      let ticking = false;
++      function update() {
++        panels.forEach(updatePanel);
++        fadeIns.forEach(updateFadeIn);
++        ticking = false;
+       }
+-
+-      function onWheel(e) {
+-        if (!canSlideNav()) return;
+-        if (animating) {
+-          e.preventDefault();
+-          return;
+-        }
+-
+-        refreshSlides();
+-        const idx = currentIndex();
+-        const active = slides[idx];
+-        const direction = e.deltaY > 0 ? 1 : -1;
+-
+-        if (active && active.id === 'carousel-pin-outer' && !carouselExhausted(direction)) {
+-          // Still room to move horizontally — let native scroll (and the
+-          // carousel's own listener) handle this event untouched.
+-          return;
+-        }
+-
+-        e.preventDefault();
+-        goToSlide(idx + direction);
++      function onScroll() {
++        if (ticking) return;
++        ticking = true;
++        requestAnimationFrame(update);
+       }
+ 
+-      refreshSlides();
+-      window.addEventListener('wheel', onWheel, { passive: false });
+-      window.addEventListener('resize', refreshSlides);
++      update();
++      window.addEventListener('scroll', onScroll, { passive: true });
++      window.addEventListener('resize', () => {
++        budget = window.innerHeight / 2;
++        update();
++      });
+     });
+   </script>
+ </body>
+diff --git a/src/styles/global.css b/src/styles/global.css
+index 81781df..670513c 100644
+--- a/src/styles/global.css
++++ b/src/styles/global.css
+@@ -133,14 +133,37 @@ header.nav {
+ }
+ 
+ /* ===================================================================
+-   HERO
++   SCROLL-LINKED SECTION TRANSITIONS
++   Shared scaffolding for full-viewport "slides" that fade + lift as they
++   scroll past, and settle into place as they arrive — driven entirely by
++   scroll position (see PortfolioLayout.astro), so the pace is exactly as
++   fast or slow as the visitor scrolls. No canned fixed-speed animation,
++   no scroll hijacking — this only ever reads position and applies a
++   transform in response.
+ =================================================================== */
+-.hero {
++.slide-panel {
++  position: relative;
+   min-height: 100vh;
+-  padding: 48px 0;
++  overflow: hidden;
++}
++
++.slide-exit-inner {
++  min-height: 100%;
++  width: 100%;
+   display: flex;
+-  flex-direction: column;
++  align-items: center;
+   justify-content: center;
++  will-change: transform, opacity;
++}
++
++.slide-fade-in {
++  will-change: transform, opacity;
++}
++
++/* ===================================================================
++   HERO
++=================================================================== */
++.hero {
+   text-align: center;
+ }
+ 
+@@ -162,12 +185,8 @@ header.nav {
+    FULL-BLEED PHOTO SLIDE(S) (Lia Vasilek style). Each landscape photo in
+    site.config.js becomes its own top-level, full-viewport snap slide.
+ =================================================================== */
+-.photo-block-section {
+-  min-height: 100vh;
+-  display: flex;
+-  align-items: center;
+-  padding: 0;
+-}
++/* .photo-block-section itself carries no unique styles — sizing and
++   positioning come from the shared .slide-panel class (see below) */
+ 
+ .photo-block {
+   margin: 0;
+@@ -371,7 +390,6 @@ header.nav {
+    SECTION SPACING
+ =================================================================== */
+ section { padding: 96px 0; }
+-section + section { border-top: 1px solid var(--line); }
+ 
+ .section-head {
+   max-width: 560px;
+@@ -392,13 +410,7 @@ section + section { border-top: 1px solid var(--line); }
+ /* ===================================================================
+    ABOUT / BIO
+ =================================================================== */
+-#about {
+-  min-height: 100vh;
+-  padding: 48px 0;
+-  display: flex;
+-  align-items: center;
+-  justify-content: center;
+-}
++/* #about carries no unique sizing — see shared .slide-panel class */
+ 
+ .about-wrap {
+   max-width: 680px;
+@@ -422,13 +434,7 @@ section + section { border-top: 1px solid var(--line); }
+ /* ===================================================================
+    COMP CARD
+ =================================================================== */
+-#compcard-section {
+-  min-height: 100vh;
+-  padding: 48px 0;
+-  display: flex;
+-  align-items: center;
+-  justify-content: center;
+-}
++/* #compcard-section carries no unique sizing — see shared .slide-panel class */
+ 
+ .compcard-box {
+   max-width: 480px;
+@@ -448,13 +454,9 @@ section + section { border-top: 1px solid var(--line); }
+ /* ===================================================================
+    CONTACT
+ =================================================================== */
+-#contact {
+-  min-height: 100vh;
+-  padding: 48px 0;
+-  display: flex;
+-  align-items: center;
+-  justify-content: center;
+-}
++/* #contact carries no unique sizing — see shared .slide-panel class.
++   The section grows naturally if the form (plus captcha) needs more
++   than 100vh on smaller screens — nothing here clips it. */
+ 
+ #contact .container {
+   width: 100%;
+@@ -532,7 +534,8 @@ footer {
+ .footer-inner a:hover { color: var(--accent-deep); }
+ 
+ /* ===================================================================
+-   SCROLL REVEAL
++   SCROLL REVEAL (generic one-time fade-in; not used by the sections
++   that now use the continuous slide-panel/slide-fade-in system above)
+ =================================================================== */
+ .reveal {
+   opacity: 0;
+@@ -544,19 +547,11 @@ footer {
+   transform: translateY(0);
+ }
+ 
+-.photo-block-section.reveal {
+-  transform: none;
+-}
+-.photo-block-section.reveal .photo-block-frame {
+-  opacity: 0;
+-  transition: opacity 1s ease;
+-}
+-.photo-block-section.reveal.is-visible .photo-block-frame {
+-  opacity: 1;
+-}
+-
+ @media (prefers-reduced-motion: reduce) {
+   html { scroll-behavior: auto; }
+-  .reveal, .photo-block-section.reveal .photo-block-frame { opacity: 1; transform: none; transition: none; }
++  .reveal { opacity: 1; transform: none; transition: none; }
+   .photo-block-frame img { transition: none; }
++
++  /* The fade/lift transform itself is skipped in PortfolioLayout.astro's
++     script for this same preference — sections just render normally. */
+ }
