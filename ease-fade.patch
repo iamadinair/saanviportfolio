@@ -1,0 +1,47 @@
+diff --git a/src/layouts/PortfolioLayout.astro b/src/layouts/PortfolioLayout.astro
+index fbb2db2..e651121 100644
+--- a/src/layouts/PortfolioLayout.astro
++++ b/src/layouts/PortfolioLayout.astro
+@@ -85,6 +85,19 @@ const {
+       const navEl = document.querySelector('header.nav');
+       const navOffset = () => (navEl ? navEl.offsetHeight : 0);
+ 
++      // Easing applied to the raw (linear) progress before it drives
++      // opacity/transform. A pure power curve keeps the endpoints fixed at
++      // 0 and 1 — so the gap-free handoff between adjacent sections is
++      // unaffected — while reshaping the middle: entrance reaches full
++      // opacity quickly and then holds, exit holds at full opacity and
++      // only drops quickly right at the end. Net effect: content spends
++      // more of the scroll fully visible, with the fade concentrated in a
++      // shorter window at each boundary rather than spread across the
++      // whole transition. Raise EASE_POWER for an even snappier feel.
++      const EASE_POWER = 2.5;
++      const easeIn = (v) => Math.pow(v, 1 / EASE_POWER);
++      const easeOut = (w) => Math.pow(w, EASE_POWER);
++
+       // Sections with their own extra scroll budget: fade+lift out at the
+       // end (exit), fade+settle in at the start (entrance) — both driven
+       // by the same outer element's position, so no cross-element state.
+@@ -103,11 +116,11 @@ const {
+         let opacity;
+         let translateY;
+         if (top >= 0) {
+-          const v = clamp(1 - top / budget, 0, 1);
++          const v = easeIn(clamp(1 - top / budget, 0, 1));
+           opacity = v;
+           translateY = (1 - v) * lift;
+         } else {
+-          const w = clamp(-top / budget, 0, 1);
++          const w = easeOut(clamp(-top / budget, 0, 1));
+           opacity = 1 - w;
+           translateY = -w * lift;
+         }
+@@ -117,7 +130,7 @@ const {
+ 
+       function updateFadeIn(el) {
+         const top = el.getBoundingClientRect().top - navOffset();
+-        const v = clamp(1 - top / budget, 0, 1);
++        const v = easeIn(clamp(1 - top / budget, 0, 1));
+         el.style.opacity = String(v);
+         el.style.transform = `translateY(${(1 - v) * lift}px)`;
+       }

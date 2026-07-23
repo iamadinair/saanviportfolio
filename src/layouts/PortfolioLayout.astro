@@ -8,8 +8,8 @@ interface Props {
 }
 
 const {
-  title = 'Saanvi Portfolio',
-  description = `${siteConfig.profile.age} · ${siteConfig.profile.location}`,
+  title = 'Saanvi — Kids Modelling Portfolio',
+  description = `${siteConfig.profile.ageRange} · ${siteConfig.profile.location}`,
 } = Astro.props;
 ---
 <!DOCTYPE html>
@@ -61,111 +61,98 @@ const {
       }
     });
 
-    // Full-page slide navigation: each top-level section (hero, each
-    // landscape photo, the carousel, bio, comp card, contact, footer) acts
-    // as its own "slide" — one deliberate scroll gesture moves cleanly to
-    // the next/previous one, using an animated scrollTo rather than relying
-    // on native CSS scroll-snap (which doesn't reliably advance on small
-    // wheel deltas — a single mouse-wheel notch is often smaller than the
-    // ~50% threshold browsers use, so it can snap back to the start instead
-    // of moving forward).
-    //
-    // The carousel is a special case: while it still has unexhausted
-    // horizontal travel in the scrolled direction, wheel events are left
-    // completely alone (no preventDefault) so its own scroll-linked pin
-    // logic (in PhotoCarousel.astro) keeps working exactly as before. Only
-    // once the carousel is exhausted in that direction does this take over
-    // and jump to the next/previous slide.
+    // Scroll-linked section transitions: as each full-viewport section is
+    // scrolled past, its content gracefully fades and lifts away while the
+    // next section's content simultaneously settles into place — driven
+    // entirely by scroll position (the same technique already used for the
+    // carousel's horizontal movement), never by a fixed-speed canned
+    // animation. This never calls preventDefault or scrollTo — it only
+    // reads scroll position and applies a transform in response — so it
+    // can't get "stuck" and works identically with mouse, trackpad, or touch.
     document.addEventListener('DOMContentLoaded', () => {
-      const slideSelector =
-        '.hero, .photo-block-section, #carousel-pin-outer, #about, #compcard-section, #contact, footer';
+      const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (prefersReducedMotion) return;
 
-      const canSlideNav = () =>
-        window.matchMedia('(min-width: 900px)').matches &&
-        window.matchMedia('(prefers-reduced-motion: no-preference)').matches;
+      // The fade/lift window is set to exactly half the viewport height.
+      // Since every full-viewport section is exactly 100vh tall, this makes
+      // the outgoing section's fade-out complete at precisely the same
+      // scroll position where the incoming section's fade-in begins — a
+      // seamless handoff with no gap where both are invisible, and no
+      // "dead" extra scroll distance added anywhere.
+      let budget = window.innerHeight / 2;
+      const lift = 56;
+      const clamp = (v, min, max) => Math.min(Math.max(v, min), max);
+      const navEl = document.querySelector('header.nav');
+      const navOffset = () => (navEl ? navEl.offsetHeight : 0);
 
-      let slides = [];
-      let animating = false;
+      // Easing applied to the raw (linear) progress before it drives
+      // opacity/transform. A pure power curve keeps the endpoints fixed at
+      // 0 and 1 — so the gap-free handoff between adjacent sections is
+      // unaffected — while reshaping the middle: entrance reaches full
+      // opacity quickly and then holds, exit holds at full opacity and
+      // only drops quickly right at the end. Net effect: content spends
+      // more of the scroll fully visible, with the fade concentrated in a
+      // shorter window at each boundary rather than spread across the
+      // whole transition. Raise EASE_POWER for an even snappier feel.
+      const EASE_POWER = 2.5;
+      const easeIn = (v) => Math.pow(v, 1 / EASE_POWER);
+      const easeOut = (w) => Math.pow(w, EASE_POWER);
 
-      function refreshSlides() {
-        slides = Array.from(document.querySelectorAll(slideSelector));
-      }
+      // Sections with their own extra scroll budget: fade+lift out at the
+      // end (exit), fade+settle in at the start (entrance) — both driven
+      // by the same outer element's position, so no cross-element state.
+      const panels = Array.from(document.querySelectorAll('.slide-panel')).map((panel) => ({
+        panel,
+        inner: panel.querySelector(':scope > .slide-exit-inner'),
+      })).filter((p) => p.inner);
 
-      function currentIndex() {
-        const y = window.scrollY + 2;
-        let idx = 0;
-        for (let i = 0; i < slides.length; i++) {
-          if (slides[i].offsetTop <= y) idx = i;
+      // Elements with an entrance-only fade (footer, the carousel) — no
+      // budget of their own, they simply settle in as they scroll up from
+      // below, then stay put.
+      const fadeIns = Array.from(document.querySelectorAll('.slide-fade-in'));
+
+      function updatePanel({ panel, inner }) {
+        const top = panel.getBoundingClientRect().top - navOffset();
+        let opacity;
+        let translateY;
+        if (top >= 0) {
+          const v = easeIn(clamp(1 - top / budget, 0, 1));
+          opacity = v;
+          translateY = (1 - v) * lift;
+        } else {
+          const w = easeOut(clamp(-top / budget, 0, 1));
+          opacity = 1 - w;
+          translateY = -w * lift;
         }
-        return idx;
+        inner.style.opacity = String(opacity);
+        inner.style.transform = `translateY(${translateY}px)`;
       }
 
-      function goToSlide(index) {
-        if (index < 0 || index >= slides.length) return;
-        animating = true;
-        const target = slides[index].offsetTop;
-        window.scrollTo({ top: target, behavior: 'smooth' });
-
-        // Detect actual scroll completion (scrollY stops changing) rather
-        // than guessing a fixed duration — native smooth-scroll takes
-        // longer for bigger jumps, and a mistimed fixed delay could let a
-        // new wheel event interrupt mid-flight and land somewhere wrong.
-        let lastY = window.scrollY;
-        let stableFrames = 0;
-        const startedAt = performance.now();
-
-        function checkDone() {
-          const y = window.scrollY;
-          const closeEnough = Math.abs(y - target) < 2;
-          const stalled = Math.abs(y - lastY) < 1;
-          stableFrames = stalled ? stableFrames + 1 : 0;
-          lastY = y;
-
-          const timedOut = performance.now() - startedAt > 2000; // safety net
-          if (closeEnough || stableFrames > 4 || timedOut) {
-            animating = false;
-            return;
-          }
-          requestAnimationFrame(checkDone);
-        }
-        requestAnimationFrame(checkDone);
+      function updateFadeIn(el) {
+        const top = el.getBoundingClientRect().top - navOffset();
+        const v = easeIn(clamp(1 - top / budget, 0, 1));
+        el.style.opacity = String(v);
+        el.style.transform = `translateY(${(1 - v) * lift}px)`;
       }
 
-      function carouselExhausted(direction) {
-        const track = document.getElementById('carousel-track');
-        if (!track) return true;
-        const maxScroll = Math.max(0, track.scrollWidth - track.clientWidth);
-        if (maxScroll <= 0) return true;
-        const matrix = new DOMMatrixReadOnly(getComputedStyle(track).transform);
-        const translated = Math.abs(matrix.m41 || 0);
-        return direction > 0 ? translated >= maxScroll - 1 : translated <= 1;
+      let ticking = false;
+      function update() {
+        panels.forEach(updatePanel);
+        fadeIns.forEach(updateFadeIn);
+        ticking = false;
+      }
+      function onScroll() {
+        if (ticking) return;
+        ticking = true;
+        requestAnimationFrame(update);
       }
 
-      function onWheel(e) {
-        if (!canSlideNav()) return;
-        if (animating) {
-          e.preventDefault();
-          return;
-        }
-
-        refreshSlides();
-        const idx = currentIndex();
-        const active = slides[idx];
-        const direction = e.deltaY > 0 ? 1 : -1;
-
-        if (active && active.id === 'carousel-pin-outer' && !carouselExhausted(direction)) {
-          // Still room to move horizontally — let native scroll (and the
-          // carousel's own listener) handle this event untouched.
-          return;
-        }
-
-        e.preventDefault();
-        goToSlide(idx + direction);
-      }
-
-      refreshSlides();
-      window.addEventListener('wheel', onWheel, { passive: false });
-      window.addEventListener('resize', refreshSlides);
+      update();
+      window.addEventListener('scroll', onScroll, { passive: true });
+      window.addEventListener('resize', () => {
+        budget = window.innerHeight / 2;
+        update();
+      });
     });
   </script>
 </body>
