@@ -1,15 +1,19 @@
 ---
 import { siteConfig } from '../data/site.config.js';
 ---
-<section id="compcard-section">
-  <div class="container">
-    <div class="section-head reveal">
-      <p class="eyebrow">For casting directors</p>
-      <h2 id="compcard">Comp card</h2>
-    </div>
-    <div class="compcard-box reveal">
-      <p>One page, ready to download and pass along.</p>
-      <a class="btn" href={siteConfig.compCardPdfPath} download>Download comp card</a>
+<section id="compcard-section" class="slide-panel">
+  <div class="accent-blob accent-blob--a" aria-hidden="true"></div>
+  <div class="accent-blob accent-blob--b" aria-hidden="true"></div>
+  <div class="slide-exit-inner">
+    <div class="container">
+      <div class="section-head">
+        <p class="eyebrow">For casting directors</p>
+        <h2 id="compcard">Comp card</h2>
+      </div>
+      <div class="compcard-box">
+        <p>One page, ready to download and pass along.</p>
+        <a class="btn" href={siteConfig.compCardPdfPath} download>Download comp card</a>
+      </div>
     </div>
   </div>
 </section>

@@ -3,6 +3,7 @@
 =================================================================== */
 :root {
   --bg:            #FBF7F2;
+  --bg-alt:        #F5EEE3;   /* slightly deeper tone for alternating sections */
   --surface:       #F1E6D8;
   --surface-2:     #E8DACB;
   --ink:           #2B241D;
@@ -33,6 +34,21 @@ body {
   font-size: 16px;
   line-height: 1.55;
   -webkit-font-smoothing: antialiased;
+  position: relative;
+}
+
+/* Subtle grain texture — adds tactile depth across the whole site without
+   being a visible "pattern"; barely perceptible, purely atmospheric. */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  pointer-events: none;
+  opacity: 0.035;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 200px 200px;
 }
 
 img { max-width: 100%; display: block; }
@@ -133,15 +149,84 @@ header.nav {
 }
 
 /* ===================================================================
+   SCROLL-LINKED SECTION TRANSITIONS
+   Shared scaffolding for full-viewport "slides" that fade + lift as they
+   scroll past, and settle into place as they arrive — driven entirely by
+   scroll position (see PortfolioLayout.astro), so the pace is exactly as
+   fast or slow as the visitor scrolls. No canned fixed-speed animation,
+   no scroll hijacking — this only ever reads position and applies a
+   transform in response.
+=================================================================== */
+.slide-panel {
+  position: relative;
+  min-height: 100vh;
+  overflow: hidden;
+}
+
+.slide-exit-inner {
+  position: relative;
+  z-index: 1;
+  min-height: 100%;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  will-change: transform, opacity;
+}
+
+.slide-fade-in {
+  will-change: transform, opacity;
+}
+
+/* Soft decorative accent shapes for text-heavy sections (Hero, Bio, Comp
+   Card, Contact) — large blurred blobs in the section's accent palette,
+   sitting behind the content, filling otherwise-empty corners without
+   competing with the text. */
+.accent-blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(70px);
+  opacity: 0.3;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.accent-blob--a {
+  width: 380px;
+  height: 380px;
+  background: var(--accent);
+  top: -110px;
+  left: -110px;
+}
+
+.accent-blob--b {
+  width: 320px;
+  height: 320px;
+  background: var(--accent-deep);
+  bottom: -100px;
+  right: -100px;
+}
+
+@media (max-width: 700px) {
+  .accent-blob--a { width: 240px; height: 240px; top: -70px; left: -80px; }
+  .accent-blob--b { width: 200px; height: 200px; bottom: -60px; right: -70px; }
+}
+
+/* Slightly deeper background tone for alternating sections — breaks up
+   what would otherwise be one long stretch of identical background,
+   without a jarring color change between adjacent slides. */
+.section-alt {
+  background: var(--bg-alt);
+}
+
+/* ===================================================================
    HERO
 =================================================================== */
 .hero {
-  min-height: 100vh;
-  padding: 48px 0;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
   text-align: center;
+  background:
+    radial-gradient(ellipse 900px 600px at 50% 38%, rgba(255,255,255,0.55), transparent 70%),
+    var(--bg);
 }
 
 .hero .eyebrow { justify-content: center; display: flex; }
@@ -162,12 +247,8 @@ header.nav {
    FULL-BLEED PHOTO SLIDE(S) (Lia Vasilek style). Each landscape photo in
    site.config.js becomes its own top-level, full-viewport snap slide.
 =================================================================== */
-.photo-block-section {
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  padding: 0;
-}
+/* .photo-block-section itself carries no unique styles — sizing and
+   positioning come from the shared .slide-panel class (see below) */
 
 .photo-block {
   margin: 0;
@@ -371,7 +452,6 @@ header.nav {
    SECTION SPACING
 =================================================================== */
 section { padding: 96px 0; }
-section + section { border-top: 1px solid var(--line); }
 
 .section-head {
   max-width: 560px;
@@ -392,12 +472,11 @@ section + section { border-top: 1px solid var(--line); }
 /* ===================================================================
    ABOUT / BIO
 =================================================================== */
+/* #about carries no unique sizing — see shared .slide-panel class */
 #about {
-  min-height: 100vh;
-  padding: 48px 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  background:
+    radial-gradient(ellipse 900px 600px at 50% 38%, rgba(255,255,255,0.4), transparent 70%),
+    var(--surface);
 }
 
 .about-wrap {
@@ -422,12 +501,11 @@ section + section { border-top: 1px solid var(--line); }
 /* ===================================================================
    COMP CARD
 =================================================================== */
+/* #compcard-section carries no unique sizing — see shared .slide-panel class */
 #compcard-section {
-  min-height: 100vh;
-  padding: 48px 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  background:
+    radial-gradient(ellipse 900px 600px at 50% 38%, rgba(255,255,255,0.55), transparent 70%),
+    var(--bg);
 }
 
 .compcard-box {
@@ -448,12 +526,13 @@ section + section { border-top: 1px solid var(--line); }
 /* ===================================================================
    CONTACT
 =================================================================== */
+/* #contact carries no unique sizing — see shared .slide-panel class.
+   The section grows naturally if the form (plus captcha) needs more
+   than 100vh on smaller screens — nothing here clips it. */
 #contact {
-  min-height: 100vh;
-  padding: 48px 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  background:
+    radial-gradient(ellipse 900px 600px at 50% 38%, rgba(255,255,255,0.4), transparent 70%),
+    var(--surface);
 }
 
 #contact .container {
@@ -532,7 +611,8 @@ footer {
 .footer-inner a:hover { color: var(--accent-deep); }
 
 /* ===================================================================
-   SCROLL REVEAL
+   SCROLL REVEAL (generic one-time fade-in; not used by the sections
+   that now use the continuous slide-panel/slide-fade-in system above)
 =================================================================== */
 .reveal {
   opacity: 0;
@@ -544,19 +624,11 @@ footer {
   transform: translateY(0);
 }
 
-.photo-block-section.reveal {
-  transform: none;
-}
-.photo-block-section.reveal .photo-block-frame {
-  opacity: 0;
-  transition: opacity 1s ease;
-}
-.photo-block-section.reveal.is-visible .photo-block-frame {
-  opacity: 1;
-}
-
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
-  .reveal, .photo-block-section.reveal .photo-block-frame { opacity: 1; transform: none; transition: none; }
+  .reveal { opacity: 1; transform: none; transition: none; }
   .photo-block-frame img { transition: none; }
+
+  /* The fade/lift transform itself is skipped in PortfolioLayout.astro's
+     script for this same preference — sections just render normally. */
 }

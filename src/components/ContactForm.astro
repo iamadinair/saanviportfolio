@@ -1,39 +1,43 @@
 ---
 import { siteConfig } from '../data/site.config.js';
 ---
-<section id="contact">
-  <div class="container">
-    <div class="section-head reveal">
-      <p class="eyebrow">Booking inquiries</p>
-      <h2>Get in touch</h2>
-      <p>Managed by my parents.</p>
-    </div>
-    <div class="contact-wrap reveal">
-      <form id="contact-form" data-access-key={siteConfig.contact.web3formsAccessKey} data-subject-prefix={siteConfig.contact.subjectPrefix} data-cc={siteConfig.contact.cc}>
-        <div class="field">
-          <label for="cf-name">Your name</label>
-          <input type="text" id="cf-name" name="name" placeholder="Agency or casting director name" required>
-        </div>
-        <div class="field">
-          <label for="cf-email">Email</label>
-          <input type="email" id="cf-email" name="email" placeholder="name@agency.com" required>
-        </div>
-        <div class="field">
-          <label for="cf-type">Inquiry type</label>
-          <select id="cf-type" name="type">
-            <option>Casting opportunity</option>
-            <option>Photoshoot request</option>
-            <option>General inquiry</option>
-          </select>
-        </div>
-        <div class="field">
-          <label for="cf-message">Message</label>
-          <textarea id="cf-message" name="message" rows="4" placeholder="Tell us about the opportunity" required></textarea>
-        </div>
-        <div class="h-captcha" data-captcha="true"></div>
-        <button type="submit" class="btn" id="cf-submit">Send inquiry</button>
-      </form>
-      <p class="form-note" id="cf-status"></p>
+<section id="contact" class="slide-panel section-alt">
+  <div class="accent-blob accent-blob--a" aria-hidden="true"></div>
+  <div class="accent-blob accent-blob--b" aria-hidden="true"></div>
+  <div class="slide-exit-inner">
+    <div class="container">
+      <div class="section-head">
+        <p class="eyebrow">Booking inquiries</p>
+        <h2>Get in touch</h2>
+        <p>Managed by parent/guardian.</p>
+      </div>
+      <div class="contact-wrap">
+        <form id="contact-form" data-access-key={siteConfig.contact.web3formsAccessKey} data-subject-prefix={siteConfig.contact.subjectPrefix} data-cc={siteConfig.contact.cc}>
+          <div class="field">
+            <label for="cf-name">Your name</label>
+            <input type="text" id="cf-name" name="name" placeholder="Agency or casting director name" required>
+          </div>
+          <div class="field">
+            <label for="cf-email">Email</label>
+            <input type="email" id="cf-email" name="email" placeholder="name@agency.com" required>
+          </div>
+          <div class="field">
+            <label for="cf-type">Inquiry type</label>
+            <select id="cf-type" name="type">
+              <option>Casting opportunity</option>
+              <option>Photoshoot request</option>
+              <option>General inquiry</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="cf-message">Message</label>
+            <textarea id="cf-message" name="message" rows="4" placeholder="Tell us about the opportunity" required></textarea>
+          </div>
+          <div class="h-captcha" data-captcha="true"></div>
+          <button type="submit" class="btn" id="cf-submit">Send inquiry</button>
+        </form>
+        <p class="form-note" id="cf-status"></p>
+      </div>
     </div>
   </div>
 </section>
@@ -69,6 +73,7 @@ import { siteConfig } from '../data/site.config.js';
       type,
       message: document.getElementById('cf-message').value.trim(),
       subject: `${subjectPrefix}${type}`,
+      ccemail: cc,
       'h-captcha-response': hCaptchaToken,
     };
 

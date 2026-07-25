@@ -6,16 +6,20 @@ const temperamentLine = profile.temperamentNotes
   .map((n) => n.toLowerCase())
   .join(' and ');
 ---
-<section id="about">
-  <div class="container about-wrap reveal">
-    <p class="eyebrow">About</p>
-    <p class="bio">
-      I'm <span>{profile.name}</span>, <span>{profile.age}</span> old and based in
-      <span> {profile.location}</span>. I stand at <span>{profile.stats.height}</span> tall,
-      weigh <span>{profile.stats.weight}</span>, and wear size <span>{profile.stats.clothingSize}</span> clothing, with
-      <span> {profile.stats.eyeColour.toLowerCase()}</span> eyes and <span>{profile.stats.hairColour.toLowerCase()}</span> hair. I'm
-      <span> {temperamentLine}</span>. Managed by my parents, I'm always happy to hear from
-      agencies and photographers looking to collaborate.
-    </p>
+<section id="about" class="slide-panel section-alt">
+  <div class="accent-blob accent-blob--a" aria-hidden="true"></div>
+  <div class="accent-blob accent-blob--b" aria-hidden="true"></div>
+  <div class="slide-exit-inner">
+    <div class="container about-wrap">
+      <p class="eyebrow">About</p>
+      <p class="bio">
+        I'm <span>{profile.name}</span>, <span>{profile.ageRange}</span> old and based in
+        <span>{profile.location}</span>. I stand at <span>{profile.stats.height}</span> tall,
+        weigh <span>{profile.stats.weight}</span>, and wear size <span>{profile.stats.clothingSize}</span> clothing, with
+        <span>{profile.stats.eyeColour.toLowerCase()}</span> eyes and <span>{profile.stats.hairColour.toLowerCase()}</span> hair. I'm
+        <span>{temperamentLine}</span>. Managed by my parents — always happy to hear from
+        agencies and photographers looking to collaborate.
+      </p>
+    </div>
   </div>
 </section>
