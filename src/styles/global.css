@@ -29,6 +29,16 @@ html { scroll-behavior: smooth; }
 body {
   margin: 0;
   background: var(--bg);
+  background: linear-gradient(
+    180deg,
+    var(--bg) 0%,
+    var(--bg-alt) 18%,
+    var(--bg) 36%,
+    var(--bg-alt) 54%,
+    var(--bg) 72%,
+    var(--bg-alt) 90%,
+    var(--bg) 100%
+  );
   color: var(--ink);
   font-family: var(--font-body);
   font-size: 16px;
@@ -160,13 +170,16 @@ header.nav {
 .slide-panel {
   position: relative;
   min-height: 100vh;
+  padding: 0;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
 .slide-exit-inner {
   position: relative;
   z-index: 1;
-  min-height: 100%;
+  flex: 1;
   width: 100%;
   display: flex;
   align-items: center;
@@ -212,12 +225,10 @@ header.nav {
   .accent-blob--b { width: 200px; height: 200px; bottom: -60px; right: -70px; }
 }
 
-/* Slightly deeper background tone for alternating sections — breaks up
-   what would otherwise be one long stretch of identical background,
-   without a jarring color change between adjacent slides. */
-.section-alt {
-  background: var(--bg-alt);
-}
+/* Background tone variation now comes from one continuous gradient on
+   body (see above) rather than a flat color per section — that avoids
+   any hard edge exactly at a section boundary, keeping the scroll feeling
+   like one continuous surface rather than stacked separate blocks. */
 
 /* ===================================================================
    HERO
@@ -315,6 +326,7 @@ header.nav {
 =================================================================== */
 .carousel-pin-outer {
   position: relative;
+  padding: 0;
 }
 
 .carousel-pin-inner {
