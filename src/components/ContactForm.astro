@@ -2,12 +2,20 @@
 import { siteConfig } from '../data/site.config.js';
 ---
 <section id="contact" class="slide-panel">
+  <div class="nursery-sky" aria-hidden="true">
+    <div class="cloud cloud--1" style="left: 15%;"></div>
+    <div class="cloud cloud--3" style="left: 60%;"></div>
+    <span class="star star--sm" style="top: 18%; left: 20%;">✦</span>
+    <span class="star" style="top: 30%; left: 88%; animation-delay: -1.4s;">✦</span>
+    <span class="star star--lg" style="top: 76%; left: 30%; animation-delay: -0.7s;">✦</span>
+    <span class="star star--sm" style="top: 88%; left: 82%; animation-delay: -2.2s;">✦</span>
+  </div>
   <div class="slide-exit-inner">
     <div class="container">
       <div class="section-head">
         <p class="eyebrow">Booking inquiries</p>
         <h2>Get in touch</h2>
-        <p>Managed by my parents/guardian.</p>
+        <p>Managed by parent/guardian.</p>
       </div>
       <div class="contact-wrap">
         <form id="contact-form" data-access-key={siteConfig.contact.web3formsAccessKey} data-subject-prefix={siteConfig.contact.subjectPrefix} data-cc={siteConfig.contact.cc}>

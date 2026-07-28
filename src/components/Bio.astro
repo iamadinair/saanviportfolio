@@ -7,6 +7,14 @@ const temperamentLine = profile.temperamentNotes
   .join(' and ');
 ---
 <section id="about" class="slide-panel">
+  <div class="nursery-sky" aria-hidden="true">
+    <div class="cloud cloud--2" style="left: 5%;"></div>
+    <div class="cloud cloud--3" style="left: 55%;"></div>
+    <span class="star" style="top: 20%; left: 78%; animation-delay: -0.9s;">✦</span>
+    <span class="star star--lg" style="top: 72%; left: 10%; animation-delay: -1.8s;">✦</span>
+    <span class="star star--sm" style="top: 84%; left: 66%; animation-delay: -2.4s;">✦</span>
+    <span class="star star--sm" style="top: 12%; left: 40%; animation-delay: -0.4s;">✦</span>
+  </div>
   <div class="slide-exit-inner">
     <div class="container about-wrap">
       <p class="eyebrow">About</p>
@@ -15,7 +23,7 @@ const temperamentLine = profile.temperamentNotes
         <span>{profile.location}</span>. I stand at <span>{profile.stats.height}</span> tall,
         weigh <span>{profile.stats.weight}</span>, and wear size <span>{profile.stats.clothingSize}</span> clothing, with
         <span>{profile.stats.eyeColour.toLowerCase()}</span> eyes and <span>{profile.stats.hairColour.toLowerCase()}</span> hair. I'm
-        <span>{temperamentLine}</span>. Managed by my parents, I'm always happy to hear from
+        <span>{temperamentLine}</span>. Managed by my parents — always happy to hear from
         agencies and photographers looking to collaborate.
       </p>
     </div>
