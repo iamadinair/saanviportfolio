@@ -53,82 +53,6 @@ body::before {
 img { max-width: 100%; display: block; }
 a { color: inherit; }
 
-/* ===================================================================
-   NURSERY SKY — decorative drifting clouds + twinkling stars.
-   Toddler-themed ambient motion for the text-only sections (Hero,
-   About, Contact). Purely decorative (aria-hidden), sits behind
-   content, and is disabled for prefers-reduced-motion.
-=================================================================== */
-.nursery-sky {
-  position: absolute;
-  inset: 0;
-  overflow: hidden;
-  z-index: 0;
-  pointer-events: none;
-}
-
-.cloud {
-  position: absolute;
-  background: #FFFDF9;
-  opacity: 0.6;
-  border-radius: 100px;
-  filter: blur(1px);
-  animation: cloud-drift linear infinite;
-}
-.cloud::before,
-.cloud::after {
-  content: '';
-  position: absolute;
-  background: inherit;
-  border-radius: 50%;
-}
-.cloud::before {
-  width: 55%;
-  height: 140%;
-  top: -60%;
-  left: 8%;
-}
-.cloud::after {
-  width: 42%;
-  height: 115%;
-  top: -48%;
-  right: 10%;
-}
-
-.cloud--1 { width: 150px; height: 48px; top: 14%; left: -180px; animation-duration: 75s; }
-.cloud--2 { width: 108px; height: 36px; top: 58%; left: -150px; animation-duration: 95s; animation-delay: -30s; opacity: 0.42; }
-.cloud--3 { width: 175px; height: 55px; top: 78%; left: -220px; animation-duration: 115s; animation-delay: -60s; }
-
-@keyframes cloud-drift {
-  from { transform: translateX(0); }
-  to   { transform: translateX(calc(100vw + 280px)); }
-}
-
-.star {
-  position: absolute;
-  color: var(--accent-deep);
-  font-size: 14px;
-  line-height: 1;
-  animation: star-twinkle 3.4s ease-in-out infinite;
-}
-.star--sm { font-size: 10px; }
-.star--lg { font-size: 19px; }
-
-@keyframes star-twinkle {
-  0%, 100% { opacity: 0.22; transform: scale(0.82); }
-  50%      { opacity: 0.85; transform: scale(1); }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .cloud, .star { animation: none; opacity: 0.35; }
-}
-
-@media (max-width: 700px) {
-  .cloud--1 { width: 110px; height: 36px; }
-  .cloud--2 { width: 84px; height: 28px; }
-  .cloud--3 { width: 130px; height: 42px; }
-}
-
 h1, h2, h3 {
   font-family: var(--font-display);
   font-weight: 600;
@@ -241,6 +165,17 @@ header.nav {
   flex-direction: column;
 }
 
+/* Text-only sections (Hero, About, Comp Card, Contact) don't need a full
+   screen of height to breathe — this noticeably cuts the amount of empty
+   space scrolled through between the actual photo content. */
+.slide-panel--compact {
+  min-height: 68vh;
+}
+
+@media (max-width: 700px) {
+  .slide-panel--compact { min-height: 62vh; }
+}
+
 .slide-exit-inner {
   position: relative;
   z-index: 1;
@@ -274,7 +209,7 @@ header.nav {
 .cloud {
   position: absolute;
   background: #FFFDF9;
-  opacity: 0.6;
+  opacity: 0.62;
   border-radius: 100px;
   filter: blur(1px);
   animation: cloud-drift linear infinite;
@@ -299,24 +234,26 @@ header.nav {
   right: 10%;
 }
 
-.cloud--1 { width: 150px; height: 46px; top: 14%; animation-duration: 75s; }
-.cloud--2 { width: 110px; height: 36px; top: 58%; animation-duration: 95s; animation-delay: -35s; opacity: 0.45; }
-.cloud--3 { width: 180px; height: 56px; top: 78%; animation-duration: 120s; animation-delay: -70s; }
+.cloud--1 { width: 240px; height: 74px; top: 12%; animation-duration: 80s; }
+.cloud--2 { width: 175px; height: 56px; top: 56%; animation-duration: 100s; animation-delay: -35s; opacity: 0.46; }
+.cloud--3 { width: 285px; height: 88px; top: 76%; animation-duration: 125s; animation-delay: -70s; }
+.cloud--4 { width: 200px; height: 62px; top: 34%; animation-duration: 90s; animation-delay: -15s; opacity: 0.4; }
 
 @keyframes cloud-drift {
-  from { transform: translateX(-220px); }
-  to   { transform: translateX(calc(100vw + 220px)); }
+  from { transform: translateX(-320px); }
+  to   { transform: translateX(calc(100vw + 320px)); }
 }
 
 .star {
   position: absolute;
   color: var(--accent-deep);
-  font-size: 14px;
+  font-size: 20px;
   line-height: 1;
   animation: star-twinkle 3.4s ease-in-out infinite;
 }
-.star--sm { font-size: 10px; }
-.star--lg { font-size: 19px; }
+.star--sm { font-size: 14px; }
+.star--lg { font-size: 28px; }
+.star--xl { font-size: 36px; }
 
 @keyframes star-twinkle {
   0%, 100% { opacity: 0.2; transform: scale(0.85); }
@@ -325,6 +262,15 @@ header.nav {
 
 @media (prefers-reduced-motion: reduce) {
   .cloud, .star { animation: none; opacity: 0.35; }
+}
+
+@media (max-width: 700px) {
+  .cloud--1 { width: 160px; height: 50px; }
+  .cloud--2 { width: 125px; height: 40px; }
+  .cloud--3 { width: 190px; height: 60px; }
+  .cloud--4 { width: 140px; height: 44px; }
+  .star--xl { font-size: 26px; }
+  .star--lg { font-size: 21px; }
 }
 
 /* ===================================================================

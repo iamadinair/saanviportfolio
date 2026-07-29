@@ -8,7 +8,7 @@ interface Props {
 }
 
 const {
-  title = 'Saanvi Portfolio',
+  title = 'Saanvi — Kids Modelling Portfolio',
   description = `${siteConfig.profile.ageRange} · ${siteConfig.profile.location}`,
 } = Astro.props;
 ---
@@ -73,13 +73,6 @@ const {
       const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
       if (prefersReducedMotion) return;
 
-      // The fade/lift window is set to exactly half the viewport height.
-      // Since every full-viewport section is exactly 100vh tall, this makes
-      // the outgoing section's fade-out complete at precisely the same
-      // scroll position where the incoming section's fade-in begins — a
-      // seamless handoff with no gap where both are invisible, and no
-      // "dead" extra scroll distance added anywhere.
-      let budget = window.innerHeight / 2;
       const lift = 56;
       const clamp = (v, min, max) => Math.min(Math.max(v, min), max);
       const navEl = document.querySelector('header.nav');
@@ -90,37 +83,72 @@ const {
       // 0 and 1 — so the gap-free handoff between adjacent sections is
       // unaffected — while reshaping the middle: entrance reaches full
       // opacity quickly and then holds, exit holds at full opacity and
-      // only drops quickly right at the end. Net effect: content spends
-      // more of the scroll fully visible, with the fade concentrated in a
-      // shorter window at each boundary rather than spread across the
-      // whole transition. Raise EASE_POWER for an even snappier feel.
+      // only drops quickly right at the end.
       const EASE_POWER = 2.5;
       const easeIn = (v) => Math.pow(v, 1 / EASE_POWER);
       const easeOut = (w) => Math.pow(w, EASE_POWER);
 
-      // Sections with their own extra scroll budget: fade+lift out at the
-      // end (exit), fade+settle in at the start (entrance) — both driven
-      // by the same outer element's position, so no cross-element state.
+      // Each panel needs TWO separate budgets, not one shared value:
+      // - exitBudget: half of the panel's OWN height, governing how it
+      //   fades away as it's scrolled past.
+      // - entranceBudget: half of the PRECEDING panel's height, governing
+      //   how this panel fades in. Using the panel's own height for this
+      //   would only line up with the preceding section's exit when both
+      //   are the same height — now that text sections (compact) and
+      //   photo/carousel sections (full height) differ, entrance has to
+      //   be pinned to whatever the previous section actually used for
+      //   its exit, or the two don't meet at the same scroll position and
+      //   a visible gap reopens where both read near-zero opacity.
+      function findPrecedingSlideHeight(startEl) {
+        let node = startEl;
+        while (node.parentElement && node.parentElement !== document.body) {
+          node = node.parentElement;
+        }
+        let sib = node.previousElementSibling;
+        while (sib) {
+          if (sib.classList.contains('slide-panel')) {
+            return sib.getBoundingClientRect().height;
+          }
+          sib = sib.previousElementSibling;
+        }
+        return window.innerHeight;
+      }
+
       const panels = Array.from(document.querySelectorAll('.slide-panel')).map((panel) => ({
         panel,
         inner: panel.querySelector(':scope > .slide-exit-inner'),
+        entranceBudget: 0,
+        exitBudget: 0,
       })).filter((p) => p.inner);
 
-      // Elements with an entrance-only fade (footer, the carousel) — no
-      // budget of their own, they simply settle in as they scroll up from
-      // below, then stay put.
-      const fadeIns = Array.from(document.querySelectorAll('.slide-fade-in'));
+      // Entrance-only elements (footer, the carousel) have no exit of
+      // their own — they borrow the preceding .slide-panel's height for
+      // their entrance, same idea as above.
+      const fadeIns = Array.from(document.querySelectorAll('.slide-fade-in')).map((el) => ({
+        el,
+        entranceBudget: 0,
+      }));
 
-      function updatePanel({ panel, inner }) {
+      function measureBudgets() {
+        panels.forEach((p) => {
+          p.exitBudget = p.panel.getBoundingClientRect().height / 2;
+          p.entranceBudget = findPrecedingSlideHeight(p.panel) / 2;
+        });
+        fadeIns.forEach((f) => {
+          f.entranceBudget = findPrecedingSlideHeight(f.el) / 2;
+        });
+      }
+
+      function updatePanel({ panel, inner, entranceBudget, exitBudget }) {
         const top = panel.getBoundingClientRect().top - navOffset();
         let opacity;
         let translateY;
         if (top >= 0) {
-          const v = easeIn(clamp(1 - top / budget, 0, 1));
+          const v = easeIn(clamp(1 - top / entranceBudget, 0, 1));
           opacity = v;
           translateY = (1 - v) * lift;
         } else {
-          const w = easeOut(clamp(-top / budget, 0, 1));
+          const w = easeOut(clamp(-top / exitBudget, 0, 1));
           opacity = 1 - w;
           translateY = -w * lift;
         }
@@ -128,9 +156,9 @@ const {
         inner.style.transform = `translateY(${translateY}px)`;
       }
 
-      function updateFadeIn(el) {
+      function updateFadeIn({ el, entranceBudget }) {
         const top = el.getBoundingClientRect().top - navOffset();
-        const v = easeIn(clamp(1 - top / budget, 0, 1));
+        const v = easeIn(clamp(1 - top / entranceBudget, 0, 1));
         el.style.opacity = String(v);
         el.style.transform = `translateY(${(1 - v) * lift}px)`;
       }
@@ -147,10 +175,11 @@ const {
         requestAnimationFrame(update);
       }
 
+      measureBudgets();
       update();
       window.addEventListener('scroll', onScroll, { passive: true });
       window.addEventListener('resize', () => {
-        budget = window.innerHeight / 2;
+        measureBudgets();
         update();
       });
     });

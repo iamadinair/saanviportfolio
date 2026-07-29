@@ -6,14 +6,19 @@ const temperamentLine = profile.temperamentNotes
   .map((n) => n.toLowerCase())
   .join(' and ');
 ---
-<section id="about" class="slide-panel">
+<section id="about" class="slide-panel slide-panel--compact">
   <div class="nursery-sky" aria-hidden="true">
     <div class="cloud cloud--2" style="left: 5%;"></div>
     <div class="cloud cloud--3" style="left: 55%;"></div>
+    <div class="cloud cloud--1" style="left: 78%;"></div>
+    <div class="cloud cloud--4" style="left: 28%;"></div>
     <span class="star" style="top: 20%; left: 78%; animation-delay: -0.9s;">✦</span>
     <span class="star star--lg" style="top: 72%; left: 10%; animation-delay: -1.8s;">✦</span>
     <span class="star star--sm" style="top: 84%; left: 66%; animation-delay: -2.4s;">✦</span>
     <span class="star star--sm" style="top: 12%; left: 40%; animation-delay: -0.4s;">✦</span>
+    <span class="star star--xl" style="top: 30%; left: 90%; animation-delay: -1.3s;">✦</span>
+    <span class="star" style="top: 60%; left: 86%; animation-delay: -2.1s;">✦</span>
+    <span class="star star--lg" style="top: 90%; left: 30%; animation-delay: -0.7s;">✦</span>
   </div>
   <div class="slide-exit-inner">
     <div class="container about-wrap">
@@ -22,8 +27,8 @@ const temperamentLine = profile.temperamentNotes
         I'm <span>{profile.name}</span>, <span>{profile.ageRange}</span> old and based in
         <span>{profile.location}</span>. I stand at <span>{profile.stats.height}</span> tall,
         weigh <span>{profile.stats.weight}</span>, and wear size <span>{profile.stats.clothingSize}</span> clothing, with
-        <span> {profile.stats.eyeColour.toLowerCase()}</span> eyes and <span>{profile.stats.hairColour.toLowerCase()}</span> hair. I'm
-        <span>{temperamentLine}</span>. I'm always happy to hear from
+        <span>{profile.stats.eyeColour.toLowerCase()}</span> eyes and <span>{profile.stats.hairColour.toLowerCase()}</span> hair. I'm
+        <span>{temperamentLine}</span>. Managed by my parents — always happy to hear from
         agencies and photographers looking to collaborate.
       </p>
     </div>
