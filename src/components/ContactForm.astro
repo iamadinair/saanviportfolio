@@ -21,38 +21,55 @@ import { siteConfig } from '../data/site.config.js';
         <h2>Get in touch</h2>
         <p>Managed by parent/guardian.</p>
       </div>
-      <div class="contact-wrap">
-        <form id="contact-form" data-access-key={siteConfig.contact.web3formsAccessKey} data-subject-prefix={siteConfig.contact.subjectPrefix} data-cc={siteConfig.contact.cc}>
-          <div class="field">
-            <label for="cf-name">Your name</label>
-            <input type="text" id="cf-name" name="name" placeholder="Agency or casting director name" required>
-          </div>
-          <div class="field">
-            <label for="cf-email">Email</label>
-            <input type="email" id="cf-email" name="email" placeholder="name@agency.com" required>
-          </div>
-          <div class="field">
-            <label for="cf-type">Inquiry type</label>
-            <select id="cf-type" name="type">
-              <option>Casting opportunity</option>
-              <option>Photoshoot request</option>
-              <option>General inquiry</option>
-            </select>
-          </div>
-          <div class="field">
-            <label for="cf-message">Message</label>
-            <textarea id="cf-message" name="message" rows="4" placeholder="Tell us about the opportunity" required></textarea>
-          </div>
-          <div class="h-captcha" data-captcha="true"></div>
-          <button type="submit" class="btn" id="cf-submit">Send inquiry</button>
-        </form>
-        <p class="form-note" id="cf-status"></p>
+      <div class="contact-cta">
+        <button type="button" class="btn" id="open-contact-modal">Contact us</button>
       </div>
     </div>
   </div>
 </section>
 
+<dialog id="contact-modal" class="contact-modal">
+  <div class="contact-modal-inner">
+    <button type="button" class="contact-modal-close" id="close-contact-modal" aria-label="Close">✕</button>
+    <div class="section-head">
+      <p class="eyebrow">Booking inquiries</p>
+      <h2>Get in touch</h2>
+      <p>Managed by parent/guardian.</p>
+    </div>
+    <div class="contact-wrap">
+      <form id="contact-form" data-access-key={siteConfig.contact.web3formsAccessKey} data-subject-prefix={siteConfig.contact.subjectPrefix} data-cc={siteConfig.contact.cc}>
+        <div class="field">
+          <label for="cf-name">Your name</label>
+          <input type="text" id="cf-name" name="name" placeholder="Agency or casting director name" required>
+        </div>
+        <div class="field">
+          <label for="cf-email">Email</label>
+          <input type="email" id="cf-email" name="email" placeholder="name@agency.com" required>
+        </div>
+        <div class="field">
+          <label for="cf-type">Inquiry type</label>
+          <select id="cf-type" name="type">
+            <option>Casting opportunity</option>
+            <option>Photoshoot request</option>
+            <option>General inquiry</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="cf-message">Message</label>
+          <textarea id="cf-message" name="message" rows="4" placeholder="Tell us about the opportunity" required></textarea>
+        </div>
+        <div class="h-captcha" data-captcha="true"></div>
+        <button type="submit" class="btn" id="cf-submit">Send inquiry</button>
+      </form>
+      <p class="form-note" id="cf-status"></p>
+    </div>
+  </div>
+</dialog>
+
 <script>
+  const openBtn = document.getElementById('open-contact-modal');
+  const closeBtn = document.getElementById('close-contact-modal');
+  const modal = document.getElementById('contact-modal');
   const form = document.getElementById('contact-form');
   const statusEl = document.getElementById('cf-status');
   const submitBtn = document.getElementById('cf-submit');
@@ -60,6 +77,53 @@ import { siteConfig } from '../data/site.config.js';
   const accessKey = form.dataset.accessKey;
   const subjectPrefix = form.dataset.subjectPrefix || '';
   const cc = form.dataset.cc;
+
+  function openModal() {
+    modal.showModal();
+    // Defer adding the visible class one frame so the opacity/transform
+    // transition actually runs (rather than starting already-visible).
+    requestAnimationFrame(() => modal.classList.add('is-visible'));
+  }
+
+  function closeModal() {
+    modal.classList.remove('is-visible');
+    const onEnd = (e) => {
+      if (e.target !== modal) return;
+      modal.removeEventListener('transitionend', onEnd);
+      modal.close();
+    };
+    modal.addEventListener('transitionend', onEnd);
+    // Safety net in case transitionend doesn't fire for some reason.
+    window.setTimeout(() => {
+      if (modal.open) modal.close();
+    }, 350);
+  }
+
+  openBtn?.addEventListener('click', openModal);
+  closeBtn?.addEventListener('click', closeModal);
+
+  // Click on the backdrop (i.e. directly on the <dialog> element itself,
+  // not any of its content) closes it.
+  modal?.addEventListener('click', (e) => {
+    if (e.target === modal) closeModal();
+  });
+
+  // Escape triggers the dialog's native 'cancel' event — intercept it so
+  // the close still animates instead of vanishing instantly.
+  modal?.addEventListener('cancel', (e) => {
+    e.preventDefault();
+    closeModal();
+  });
+
+  // Reset the form back to a clean state whenever the modal fully closes,
+  // so reopening it later doesn't show a stale success/error message.
+  modal?.addEventListener('close', () => {
+    form.reset();
+    statusEl.textContent = '';
+    submitBtn.disabled = false;
+    submitBtn.textContent = 'Send inquiry';
+    if (window.hcaptcha) window.hcaptcha.reset();
+  });
 
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -100,7 +164,9 @@ import { siteConfig } from '../data/site.config.js';
 
       if (res.ok && data.success) {
         statusEl.textContent = "Thanks — that's been sent. We'll be in touch soon.";
-        form.reset();
+        // Don't form.reset() here — the modal's own 'close' handler resets
+        // it, and clearing it immediately would erase the success message
+        // context while the visitor can still see the modal open.
       } else {
         statusEl.textContent = data.message || 'Something went wrong sending that — please try again.';
       }
