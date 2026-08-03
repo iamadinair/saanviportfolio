@@ -24,7 +24,7 @@ export const siteConfig = {
     // NOTE: ccemail is a Web3Forms PRO feature — on the free plan this field
     // is very likely ignored. Verify in your Web3Forms dashboard; if
     // unsupported, forward manually from the primary inbox instead.
-    //cc: 'adit_nair@hotmail.com',
+    cc: 'adit_nair@hotmail.com',
   },
 
   // ---- Social ----
@@ -33,7 +33,7 @@ export const siteConfig = {
   // ---- Profile ----
   profile: {
     name: 'Saanvi',
-    age: '1 year',
+    ageRange: '12–18 months',
     location: 'Melbourne, Australia',
     stats: {
       height: '73 cm',
@@ -45,7 +45,7 @@ export const siteConfig = {
     // Pick 2–4 of these, or write your own — keep them specific and true.
     temperamentNotes: [
       'Comfortable with strangers',
-      'Adapt well to wardrobe changes',
+      'Adapts well to wardrobe changes',
       'Settles quickly after a short warm-up on set',
       'Happy under studio lighting',
       'Enjoys music playing during shoots',
@@ -83,11 +83,11 @@ export const siteConfig = {
       index: '04',
       caption: 'Everyday moments',
     },
-        {
-      src: '/images/gallery-saanvi-05-floral-dress.png',
-      alt: 'Saanvi in a floral dress, smiling at the camera',
+    {
+      src: '/images/gallery-saanvi-05-grass.png',
+      alt: 'Saanvi sitting on artificial grass in a pink striped polo and floral pants',
       index: '05',
-      caption: 'Happy times',
+      caption: 'Golden hour giggles',
     },
     {
       placeholder: true,

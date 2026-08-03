@@ -31,11 +31,7 @@ import { siteConfig } from '../data/site.config.js';
 <dialog id="contact-modal" class="contact-modal">
   <div class="contact-modal-inner">
     <button type="button" class="contact-modal-close" id="close-contact-modal" aria-label="Close">✕</button>
-    <div class="section-head">
-      <p class="eyebrow">Booking inquiries</p>
-      <h2>Get in touch</h2>
-      <p>Managed by parent/guardian.</p>
-    </div>
+    <p class="contact-modal-title">Get in touch</p>
     <div class="contact-wrap">
       <form id="contact-form" data-access-key={siteConfig.contact.web3formsAccessKey} data-subject-prefix={siteConfig.contact.subjectPrefix} data-cc={siteConfig.contact.cc}>
         <div class="field">
@@ -56,7 +52,7 @@ import { siteConfig } from '../data/site.config.js';
         </div>
         <div class="field">
           <label for="cf-message">Message</label>
-          <textarea id="cf-message" name="message" rows="4" placeholder="Tell us about the opportunity" required></textarea>
+          <textarea id="cf-message" name="message" rows="3" placeholder="Tell us about the opportunity" required></textarea>
         </div>
         <div class="h-captcha" data-captcha="true"></div>
         <button type="submit" class="btn" id="cf-submit">Send inquiry</button>
