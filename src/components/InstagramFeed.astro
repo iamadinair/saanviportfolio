@@ -1,0 +1,35 @@
+---
+import { siteConfig } from '../data/site.config.js';
+const { instagramFeed, instagram } = siteConfig;
+---
+<section id="instagram-feed" class="slide-panel slide-panel--compact">
+  <div class="nursery-sky" aria-hidden="true">
+    <div class="cloud cloud--2" style="left: 10%;"></div>
+    <div class="cloud cloud--4" style="left: 68%;"></div>
+    <span class="star star--lg" style="top: 14%; left: 88%; animation-delay: -1s;">✦</span>
+    <span class="star star--sm" style="top: 78%; left: 12%; animation-delay: -2s;">✦</span>
+    <span class="star" style="top: 20%; left: 6%; animation-delay: -0.5s;">✦</span>
+  </div>
+  <div class="slide-exit-inner">
+    <div class="container">
+      <div class="section-head">
+        <p class="eyebrow">Follow along</p>
+        <h2>On Instagram</h2>
+        {instagram && (
+          <p><a href={instagram} target="_blank" rel="noopener">@{instagram.replace(/\/$/, '').split('/').pop()}</a></p>
+        )}
+      </div>
+      <div class="instagram-embed-frame">
+        <iframe
+          src={instagramFeed.embedUrl}
+          scrolling="no"
+          allowtransparency="true"
+          class="instagram-embed-iframe lightwidget-widget"
+          title="Instagram feed"
+        ></iframe>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script src="//cdn.lightwidget.com/widgets/lightwidget.js"></script>

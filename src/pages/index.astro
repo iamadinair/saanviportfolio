@@ -6,6 +6,7 @@ import PhotoSequence from '../components/PhotoSequence.astro';
 import PhotoCarousel from '../components/PhotoCarousel.astro';
 import Bio from '../components/Bio.astro';
 import CompCard from '../components/CompCard.astro';
+import InstagramFeed from '../components/InstagramFeed.astro';
 import ContactForm from '../components/ContactForm.astro';
 import Footer from '../components/Footer.astro';
 import { siteConfig } from '../data/site.config.js';
@@ -17,6 +18,7 @@ import { siteConfig } from '../data/site.config.js';
   <Bio />
   <PhotoCarousel />
   {siteConfig.showCompCard && <CompCard />}
+  {siteConfig.instagramFeed.enabled && siteConfig.instagramFeed.embedUrl && <InstagramFeed />}
   <ContactForm />
   <Footer />
 </PortfolioLayout>

@@ -588,6 +588,34 @@ section { padding: 96px 0; }
 }
 
 /* ===================================================================
+   INSTAGRAM FEED (embedded via LightWidget)
+=================================================================== */
+.section-head a {
+  color: var(--accent-deep);
+  font-weight: 600;
+  text-decoration: none;
+}
+.section-head a:hover { text-decoration: underline; }
+
+.instagram-embed-frame {
+  max-width: 720px;
+  margin: 0 auto;
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  padding: 4px;
+}
+
+.instagram-embed-iframe {
+  width: 100%;
+  border: 0;
+  overflow: hidden;
+  border-radius: calc(var(--radius) - 4px);
+  min-height: 320px;
+}
+
+/* ===================================================================
    CONTACT MODAL
 =================================================================== */
 .contact-modal {

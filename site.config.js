@@ -24,27 +24,16 @@ export const siteConfig = {
     // NOTE: ccemail is a Web3Forms PRO feature — on the free plan this field
     // is very likely ignored. Verify in your Web3Forms dashboard; if
     // unsupported, forward manually from the primary inbox instead.
-    cc: 'adit_nair@hotmail.com',
+    //cc: 'adit_nair@hotmail.com',
   },
 
   // ---- Social ----
   instagram: 'https://www.instagram.com/itslimulicious/',
 
-  // Embedded live Instagram feed (via LightWidget — https://lightwidget.com).
-  // Flip to true once you have a real widget URL from LightWidget's
-  // dashboard (after connecting your Instagram Professional account there).
-  // While false, the feed section is skipped entirely when the page renders.
-  instagramFeed: {
-    enabled: true,
-    // Paste the src URL from LightWidget's embed code here, e.g.
-    // '//lightwidget.com/widgets/xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.html'
-    embedUrl: '//lightwidget.com/widgets/48bb12215af35a89ad631074a61c370a.html',
-  },
-
   // ---- Profile ----
   profile: {
     name: 'Saanvi',
-    ageRange: '1 year',
+    age: '1 year',
     location: 'Melbourne, Australia',
     stats: {
       height: '73 cm',
@@ -94,11 +83,11 @@ export const siteConfig = {
       index: '04',
       caption: 'Everyday moments',
     },
-    {
-      src: '/images/gallery-saanvi-05-grass.png',
-      alt: 'Saanvi sitting on artificial grass in a pink striped polo and floral pants',
+        {
+      src: '/images/gallery-saanvi-05-floral-dress.png',
+      alt: 'Saanvi in a floral dress, smiling at the camera',
       index: '05',
-      caption: 'Golden hour giggles',
+      caption: 'Happy times',
     },
     {
       placeholder: true,
