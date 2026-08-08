@@ -20,16 +20,10 @@ const { instagramFeed, instagram } = siteConfig;
         )}
       </div>
       <div class="instagram-embed-frame">
-        <iframe
-          src={instagramFeed.embedUrl}
-          scrolling="no"
-          allowtransparency="true"
-          class="instagram-embed-iframe lightwidget-widget"
-          title="Instagram feed"
-        ></iframe>
+        <div class:list={['instagram-embed-app', instagramFeed.elfsightWidgetClass]} data-elfsight-app-lazy></div>
       </div>
     </div>
   </div>
 </section>
 
-<script is:inline src="//cdn.lightwidget.com/widgets/lightwidget.js"></script>
+<script is:inline src="https://elfsightcdn.com/platform.js" async></script>

@@ -30,15 +30,13 @@ export const siteConfig = {
   // ---- Social ----
   instagram: 'https://www.instagram.com/itslimulicious/',
 
-  // Embedded live Instagram feed (via LightWidget — https://lightwidget.com).
-  // Flip to true once you have a real widget URL from LightWidget's
-  // dashboard (after connecting your Instagram Professional account there).
-  // While false, the feed section is skipped entirely when the page renders.
+  // Embedded live Instagram feed (via Elfsight — https://elfsight.com).
+  // Flip to true/false to show or hide the feed section entirely.
   instagramFeed: {
     enabled: true,
-    // Paste the src URL from LightWidget's embed code here, e.g.
-    // '//lightwidget.com/widgets/xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.html'
-    embedUrl: '//lightwidget.com/widgets/48bb12215af35a89ad631074a61c370a.html',
+    // The unique widget class from Elfsight's embed code, e.g.
+    // 'elfsight-app-xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx'
+    elfsightWidgetClass: 'elfsight-app-98254f9a-d641-4dd0-bc6e-e7219e1ef66e',
   },
 
   // ---- Profile ----
